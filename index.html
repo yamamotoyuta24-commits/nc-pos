@@ -137,10 +137,14 @@
       border-color: #ea580c;
     }
     .menu-name {
-      font-size: 15px;
-      font-weight: 700;
+      font-size: 14px;
+      font-weight: 800;
       color: #1e293b;
       line-height: 1.25;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
     .menu-price {
       font-size: 17px;
@@ -747,13 +751,9 @@
       <div class="clock-display" id="clock">00:00:00</div>
     </div>
 
-    <!-- Category Tabs -->
+    <!-- Category Tabs (動的生成) -->
     <div class="cat-bar" id="categoryTabs">
       <button class="cat-btn active" onclick="filterCategory('All', this)">ALL</button>
-      <button class="cat-btn" onclick="filterCategory('Beer', this)">Beer</button>
-      <button class="cat-btn" onclick="filterCategory('Cocktail', this)">Cocktail</button>
-      <button class="cat-btn" onclick="filterCategory('Food', this)">Food</button>
-      <button class="cat-btn" onclick="filterCategory('Other', this)">Other</button>
     </div>
 
     <!-- Menu Grid -->
@@ -790,7 +790,7 @@
         <span id="totalDisplay" style="color: #ea580c;">฿0</span>
       </div>
 
-      <!-- 改修：Payment丸ボタン（左） ＆ Orderメインボタン（右） -->
+      <!-- Payment丸ボタン（左） ＆ Orderメインボタン（右） -->
       <div class="action-button-row">
         <button type="button" onclick="openPaymentModal()" id="btnCheckout" class="btn-round-pay" title="Proceed to Payment" disabled>
           <span class="btn-round-pay-icon">💳</span>
@@ -1072,7 +1072,8 @@
   </div>
 
   <script>
-  const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbyruDGnOAXP4eZLoewLXg9g6OdOCdtuScHIqEqVTOSQow_cNChgLVnh6cDdiRexkcUTZQ/exec";
+    const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbyruDGnOAXP4eZLoewLXg9g6OdOCdtuScHIqEqVTOSQow_cNChgLVnh6cDdiRexkcUTZQ/exec";
+
     const DEFAULT_LAYOUT = [
       { id: "Bar-1", label: "Bar-1", type: "bar-seat", x: 30, y: 30 },
       { id: "Bar-2", label: "Bar-2", type: "bar-seat", x: 110, y: 30 },
@@ -1100,18 +1101,8 @@
     let selectedNationality = null;
     let guestCount = 1;
 
-    const MENU_ITEMS = [
-      { id: "M01", name: "Singha Beer", category: "Beer", price: 120 },
-      { id: "M02", name: "Chang Beer", category: "Beer", price: 100 },
-      { id: "M03", name: "Leo Beer", category: "Beer", price: 100 },
-      { id: "M04", name: "Gin Tonic", category: "Cocktail", price: 180 },
-      { id: "M05", name: "Highball", category: "Cocktail", price: 160 },
-      { id: "M06", name: "Mojito", category: "Cocktail", price: 200 },
-      { id: "M07", name: "French Fries", category: "Food", price: 120 },
-      { id: "M08", name: "Edamame", category: "Food", price: 80 },
-      { id: "M09", name: "Cat Snack", category: "Other", price: 50 },
-      { id: "M10", name: "Water", category: "Other", price: 40 }
-    ];
+    // スプレッドシート連携メニュー（ローカルキャッシュから即時復元）
+    let menuItems = JSON.parse(localStorage.getItem('NC_POS_MENU_CACHE')) || [];
 
     let currentOrder = [];
     let selectedPayment = null;
@@ -1120,8 +1111,8 @@
     let receivedCashAmount = 0;
     let changeDueAmount = 0;
     let selectedCashier = "";
+    let currentCategory = "All";
 
-    // 商品選択モーダル用の一時保持データ
     let pendingModalItem = null;
     let pendingModalQty = 1;
 
@@ -1129,7 +1120,43 @@
       document.getElementById('clock').innerText = new Date().toLocaleTimeString();
     }, 1000);
 
-    /* スマホ専用スライドアップカート制御 */
+    /* スプレッドシートから最新メニューを自動取得 */
+    async function loadMenuFromSpreadsheet() {
+      try {
+        const res = await fetch(GAS_ENDPOINT);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            menuItems = data;
+            localStorage.setItem('NC_POS_MENU_CACHE', JSON.stringify(menuItems));
+            buildCategoryTabs();
+            renderMenu(currentCategory);
+          }
+        }
+      } catch (e) {
+        console.warn("Using offline cached menu:", e);
+      }
+    }
+
+    /* メニュー内のカテゴリーに応じて上部タブを自動構築 */
+    function buildCategoryTabs() {
+      const container = document.getElementById('categoryTabs');
+      const categories = ["All"];
+      menuItems.forEach(item => {
+        const cat = item.category || "Cocktail";
+        if (!categories.includes(cat)) categories.push(cat);
+      });
+
+      container.innerHTML = '';
+      categories.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.className = `cat-btn ${cat === currentCategory ? 'active' : ''}`;
+        btn.innerText = cat.toUpperCase();
+        btn.onclick = () => filterCategory(cat, btn);
+        container.appendChild(btn);
+      });
+    }
+
     function toggleSpCart(open) {
       const cart = document.getElementById('cartSidebar');
       if (open) {
@@ -1367,9 +1394,15 @@
     }
 
     function renderMenu(category = 'All') {
+      currentCategory = category;
       const grid = document.getElementById('menuGrid');
       grid.innerHTML = '';
-      const filtered = category === 'All' ? MENU_ITEMS : MENU_ITEMS.filter(i => i.category === category);
+      const filtered = category === 'All' ? menuItems : menuItems.filter(i => (i.category || 'Cocktail') === category);
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #94a3b8; padding: 40px; font-weight: 700;">Loading menu from spreadsheet...</div>';
+        return;
+      }
 
       filtered.forEach(item => {
         const btn = document.createElement('div');
@@ -1385,7 +1418,7 @@
 
     function filterCategory(cat, el) {
       document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
-      el.classList.add('active');
+      if (el) el.classList.add('active');
       renderMenu(cat);
     }
 
@@ -1523,7 +1556,7 @@
       if (btnSendOrder) btnSendOrder.disabled = !hasUnconfirmed;
     }
 
-    /* ==================== 注文確認ポップアップ ==================== */
+    /* 注文確認ポップアップ */
     function confirmCurrentOrderOnly() {
       const unconfirmedItems = currentOrder.filter(i => !i.confirmed);
       if (unconfirmedItems.length === 0) {
@@ -1586,7 +1619,7 @@
       }, 3000);
     }
 
-    /* ==================== テーブル情報削除モーダル ==================== */
+    /* テーブル情報削除モーダル */
     function confirmDeleteTableInfoModal() {
       const session = tableSessions[currentTable];
       document.getElementById('delModalTable').innerText = currentTable;
@@ -1637,7 +1670,7 @@
       }, 3000);
     }
 
-    /* ==================== 会計 & Cashier & Scan/Cash & Tip フロー ==================== */
+    /* 会計 & Cashier & Scan/Cash & Tip フロー */
     function populateDropdowns() {
       const cashierSel = document.getElementById('selectCashier');
       cashierSel.innerHTML = '<option value="" disabled selected>-- Select Cashier --</option>';
@@ -1985,8 +2018,11 @@
       }, 1000);
     }
 
+    // アプリ起動時の初期化実行
     openSessionModal();
+    buildCategoryTabs();
     renderMenu();
+    loadMenuFromSpreadsheet(); // スプレッドシートからメニューを取得
   </script>
 </body>
 </html>

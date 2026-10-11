@@ -24,6 +24,7 @@
     }
     body {
       display: flex;
+      position: relative;
     }
     
     /* 左側メインエリア */
@@ -68,12 +69,16 @@
     .badge-customer {
       font-weight: 700;
       color: #7c2d12;
-      font-size: 14px;
+      font-size: 13px;
       border-left: 1px solid #fdba74;
       padding-left: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 180px;
     }
     .clock-display {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       color: #64748b;
     }
@@ -91,7 +96,7 @@
       border: none;
       padding: 10px 18px;
       border-radius: 10px;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
       cursor: pointer;
       background: #ffffff;
@@ -109,7 +114,7 @@
       padding: 14px;
       overflow-y: auto;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
       gap: 12px;
       align-content: start;
     }
@@ -143,7 +148,7 @@
       color: #ea580c;
     }
 
-    /* 右側伝票エリア */
+    /* 右側伝票エリア（PC / iPad） */
     .cart-area {
       width: 350px;
       background: #ffffff;
@@ -152,6 +157,8 @@
       height: 100%;
       box-shadow: -2px 0 6px rgba(0,0,0,0.04);
       flex-shrink: 0;
+      transition: transform 0.25s ease-in-out;
+      z-index: 50;
     }
     .cart-header {
       padding: 12px 16px;
@@ -173,6 +180,14 @@
       color: #ef4444;
       font-size: 13px;
       font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-close-sp-cart {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: #64748b;
       cursor: pointer;
     }
 
@@ -304,6 +319,27 @@
       cursor: not-allowed;
     }
 
+    /* スマホ専用のフローティングカートボタンバー */
+    .sp-cart-floating-btn {
+      display: none;
+      position: fixed;
+      bottom: 14px;
+      left: 14px;
+      right: 14px;
+      background: #ea580c;
+      color: #ffffff;
+      padding: 14px 20px;
+      border-radius: 14px;
+      box-shadow: 0 10px 20px -3px rgba(234, 88, 12, 0.4);
+      justify-content: space-between;
+      align-items: center;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      z-index: 40;
+    }
+
+    /* モーダル */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -325,6 +361,8 @@
       flex-direction: column;
       gap: 14px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      max-height: 90vh;
+      overflow-y: auto;
     }
     .modal-header {
       display: flex;
@@ -515,6 +553,81 @@
       cursor: not-allowed !important;
     }
     .hidden { display: none !important; }
+
+    /* ========================================================
+       📱 スマホ縦画面（幅768px以下）用レスポンシブスタイル
+       ======================================================== */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+      .main-area {
+        width: 100%;
+        border-right: none;
+      }
+      .header-bar {
+        padding: 8px 12px;
+      }
+      .brand-title {
+        font-size: 18px;
+      }
+      .active-session-badge {
+        padding: 4px 10px;
+      }
+      .badge-table {
+        font-size: 13px;
+      }
+      .badge-customer {
+        font-size: 12px;
+        max-width: 110px;
+      }
+      .clock-display {
+        font-size: 11px;
+      }
+      .menu-container {
+        padding-bottom: 80px; /* 下部フローティングバーの余白 */
+        grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+        gap: 8px;
+      }
+      .menu-card {
+        height: 95px;
+        padding: 10px;
+      }
+      .menu-name {
+        font-size: 13px;
+      }
+      .menu-price {
+        font-size: 15px;
+      }
+
+      /* スマホではカートをスライドアップシートに変形 */
+      .cart-area {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 80vh;
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -10px 25px rgba(0,0,0,0.2);
+        transform: translateY(100%);
+      }
+      .cart-area.sp-open {
+        transform: translateY(0);
+      }
+      .btn-close-sp-cart {
+        display: block;
+      }
+      .sp-cart-floating-btn {
+        display: flex;
+      }
+      .modal-card {
+        padding: 16px;
+        max-height: 94vh;
+      }
+      .floor-canvas-container {
+        height: 260px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -524,15 +637,15 @@
     <div class="modal-card">
       <div class="modal-header">
         <div>
-          <h3 style="font-size: 19px; font-weight: 900; color: #0f172a;">Floor Map & Table Select</h3>
+          <h3 style="font-size: 18px; font-weight: 900; color: #0f172a;">Floor Map & Table Select</h3>
           <p style="font-size: 12px; color: #64748b; font-weight: 600;">Tap seat to select, or edit layout</p>
         </div>
         <div class="edit-toolbar">
           <button type="button" onclick="confirmDeleteTableInfoModal()" class="btn-delete-table-info">
-            🗑 Delete Table Info
+            🗑 Delete
           </button>
           <button id="btnToggleEdit" onclick="toggleEditMode()" class="btn-edit-mode">
-            ⚙ Edit Layout
+            ⚙ Edit
           </button>
         </div>
       </div>
@@ -542,35 +655,35 @@
 
       <!-- 編集モードツールボタン -->
       <div id="editToolsBlock" class="hidden" style="display: flex; gap: 8px;">
-        <button onclick="addNewSeat('Bar')" style="flex: 1; background: #f8fafc; border: 1.5px solid #cbd5e1; padding: 8px; border-radius: 8px; font-weight: 700; font-size: 13px;">+ Add Bar Seat</button>
-        <button onclick="addNewSeat('Table')" style="flex: 1; background: #f8fafc; border: 1.5px solid #cbd5e1; padding: 8px; border-radius: 8px; font-weight: 700; font-size: 13px;">+ Add Table</button>
-        <button onclick="resetDefaultLayout()" style="background: #fee2e2; border: 1px solid #f87171; color: #b91c1c; padding: 8px 12px; border-radius: 8px; font-weight: 700; font-size: 13px;">Reset</button>
+        <button onclick="addNewSeat('Bar')" style="flex: 1; background: #f8fafc; border: 1.5px solid #cbd5e1; padding: 8px; border-radius: 8px; font-weight: 700; font-size: 12px;">+ Add Bar</button>
+        <button onclick="addNewSeat('Table')" style="flex: 1; background: #f8fafc; border: 1.5px solid #cbd5e1; padding: 8px; border-radius: 8px; font-weight: 700; font-size: 12px;">+ Add Table</button>
+        <button onclick="resetDefaultLayout()" style="background: #fee2e2; border: 1px solid #f87171; color: #b91c1c; padding: 8px 12px; border-radius: 8px; font-weight: 700; font-size: 12px;">Reset</button>
       </div>
 
       <!-- 客名入力 -->
       <div>
-        <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 6px;">Customer / Guest Name</label>
+        <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 4px;">Customer / Guest Name</label>
         <input type="text" id="inputCustomerName" class="input-customer" placeholder="Enter guest name or note..." autocomplete="off">
       </div>
 
       <!-- 人数 & 国籍選択（必須項目） -->
-      <div style="display: flex; gap: 12px;">
+      <div style="display: flex; gap: 10px;">
         <div style="flex: 1;">
-          <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 6px;">
+          <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 4px;">
             Guests <span style="color: #ef4444;">*</span>
           </label>
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <button type="button" onclick="changeGuestCount(-1)" class="btn-qty" style="width: 36px; height: 36px; font-size: 18px;">-</button>
-            <input type="number" id="inputGuestCount" min="1" max="20" value="1" readonly style="width: 100%; text-align: center; font-size: 17px; font-weight: 800; border: 2px solid #cbd5e1; border-radius: 10px; height: 36px; background: #fff;">
-            <button type="button" onclick="changeGuestCount(1)" class="btn-qty" style="width: 36px; height: 36px; font-size: 18px;">+</button>
+          <div style="display: flex; align-items: center; gap: 4px;">
+            <button type="button" onclick="changeGuestCount(-1)" class="btn-qty" style="width: 32px; height: 32px; font-size: 16px;">-</button>
+            <input type="number" id="inputGuestCount" min="1" max="20" value="1" readonly style="width: 100%; text-align: center; font-size: 16px; font-weight: 800; border: 2px solid #cbd5e1; border-radius: 8px; height: 32px; background: #fff;">
+            <button type="button" onclick="changeGuestCount(1)" class="btn-qty" style="width: 32px; height: 32px; font-size: 16px;">+</button>
           </div>
         </div>
 
         <div style="flex: 2;">
-          <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 6px;">
+          <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 4px;">
             Nationality <span style="color: #ef4444;">*</span>
           </label>
-          <div style="display: flex; gap: 6px;">
+          <div style="display: flex; gap: 4px;">
             <button type="button" onclick="selectNationality('Thai')" id="nat-Thai" class="nat-btn">Thai</button>
             <button type="button" onclick="selectNationality('Asia')" id="nat-Asia" class="nat-btn">Asia</button>
             <button type="button" onclick="selectNationality('Foreigner')" id="nat-Foreigner" class="nat-btn">Foreigner</button>
@@ -587,7 +700,7 @@
   <!-- ==================== メイン画面 ==================== -->
   <div class="main-area">
     <div class="header-bar">
-      <div style="display: flex; align-items: center; gap: 14px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
         <span class="brand-title">NC-POS</span>
         <div class="active-session-badge" onclick="openSessionModal()" title="Tap to change table/guest">
           <span class="badge-table" id="headerTable">Bar-1</span>
@@ -610,10 +723,19 @@
     <div class="menu-container" id="menuGrid"></div>
   </div>
 
-  <!-- Cart / Sidebar -->
-  <div class="cart-area">
+  <!-- スマホ用：下部フローティングカートバー -->
+  <div class="sp-cart-floating-btn" id="spCartBar" onclick="toggleSpCart(true)">
+    <span>🛒 View Order (<span id="spCartCount">0</span>)</span>
+    <span id="spCartTotal">฿0</span>
+  </div>
+
+  <!-- Cart / Sidebar（PCでは右側固定、スマホではスライドアップ） -->
+  <div class="cart-area" id="cartSidebar">
     <div class="cart-header">
-      <span class="cart-title">Order Details</span>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <button onclick="toggleSpCart(false)" class="btn-close-sp-cart">&times;</button>
+        <span class="cart-title">Order Details</span>
+      </div>
       <button onclick="clearCurrentOrder()" class="btn-clear">Clear All</button>
     </div>
 
@@ -758,7 +880,7 @@
           </div>
         </div>
 
-        <!-- Cash入力領域（ここではお釣りを出さず、預かり金額の入力のみ） -->
+        <!-- Cash入力領域 -->
         <div id="cashArea" class="hidden" style="border-top: 1px solid #e2e8f0; padding-top: 14px; margin-top: 12px; display: flex; flex-direction: column; gap: 12px;">
           <div>
             <label style="display: block; font-size: 13px; font-weight: 800; color: #475569; margin-bottom: 6px;">Received Amount (฿) <span style="color: #ef4444;">*</span></label>
@@ -804,7 +926,7 @@
         </div>
       </div>
 
-      <!-- ステップ2: Tip入力画面（Cash時はお釣りを特大表示） -->
+      <!-- ステップ2: Tip入力画面 -->
       <div id="paymentStepTip" class="hidden">
         <div class="modal-header" style="border-bottom: 2px solid #ef4444;">
           <div>
@@ -817,7 +939,7 @@
           Cashier: <span id="displayActiveCashier" style="color: #ea580c;"></span>
         </div>
 
-        <!-- 【強化】Cash時専用：スタッフにわかりやすい特大お釣り表示枠 -->
+        <!-- Cash時専用：特大お釣り表示枠 -->
         <div id="tipScreenChangeBox" class="hidden" style="background: #f0fdf4; border: 3px solid #16a34a; border-radius: 16px; padding: 16px 12px; text-align: center; margin-top: 10px; box-shadow: 0 4px 6px -1px rgba(22, 163, 74, 0.15);">
           <div style="font-size: 14px; font-weight: 800; color: #166534; letter-spacing: 0.5px; text-transform: uppercase;">Change Due (お釣り)</div>
           <div id="tipScreenChangeAmount" style="font-size: 38px; font-weight: 900; color: #15803d; line-height: 1.1; margin-top: 4px;">฿0</div>
@@ -931,6 +1053,16 @@
       document.getElementById('clock').innerText = new Date().toLocaleTimeString();
     }, 1000);
 
+    /* スマホ専用スライドアップカート制御 */
+    function toggleSpCart(open) {
+      const cart = document.getElementById('cartSidebar');
+      if (open) {
+        cart.classList.add('sp-open');
+      } else {
+        cart.classList.remove('sp-open');
+      }
+    }
+
     function renderFloorMap() {
       const canvas = document.getElementById('floorCanvas');
       canvas.innerHTML = '';
@@ -1043,7 +1175,7 @@
         canvas.classList.add('editing');
         tools.classList.remove('hidden');
       } else {
-        btn.innerText = "⚙ Edit Layout";
+        btn.innerText = "⚙ Edit";
         btn.className = "btn-edit-mode";
         canvas.classList.remove('editing');
         tools.classList.add('hidden');
@@ -1228,10 +1360,14 @@
         localStorage.setItem('NC_POS_SESSIONS', JSON.stringify(tableSessions));
       }
       
+      const totalCount = currentOrder.reduce((acc, i) => acc + i.quantity, 0);
+      document.getElementById('spCartCount').innerText = totalCount;
+
       if (currentOrder.length === 0) {
         container.innerHTML = '<p style="text-align: center; color: #94a3b8; margin-top: 30px; font-weight: 600; font-size: 14px;">Select items from menu</p>';
         document.getElementById('subtotalDisplay').innerText = '฿0';
         document.getElementById('totalDisplay').innerText = '฿0';
+        document.getElementById('spCartTotal').innerText = '฿0';
         btnCheckout.disabled = true;
         if (btnSendOrder) btnSendOrder.disabled = true;
         return;
@@ -1250,7 +1386,7 @@
         row.className = `cart-item-row ${item.confirmed ? 'is-confirmed' : ''}`;
 
         const actionControl = item.confirmed
-          ? `<button onclick="cancelConfirmedItem(${index})" class="btn-item-cancel">Cancel Item</button>`
+          ? `<button onclick="cancelConfirmedItem(${index})" class="btn-item-cancel">Cancel</button>`
           : `<div class="qty-controls">
                <button onclick="changeQuantity(${index}, -1)" class="btn-qty">-</button>
                <span class="qty-display">${item.quantity}</span>
@@ -1272,6 +1408,7 @@
 
       document.getElementById('subtotalDisplay').innerText = `฿${total}`;
       document.getElementById('totalDisplay').innerText = `฿${total}`;
+      document.getElementById('spCartTotal').innerText = `฿${total}`;
       
       btnCheckout.disabled = false;
       if (btnSendOrder) btnSendOrder.disabled = !hasUnconfirmed;
@@ -1329,6 +1466,7 @@
       }
 
       renderOrder();
+      toggleSpCart(false);
 
       document.getElementById('orderConfirmContent').classList.add('hidden');
       document.getElementById('orderSuccessContent').classList.remove('hidden');
@@ -1429,6 +1567,7 @@
     }
 
     function openPaymentModal() {
+      toggleSpCart(false);
       const total = currentOrder.reduce((acc, i) => acc + (i.price * i.quantity), 0);
       document.getElementById('modalTotalDisplay').innerText = `฿${total}`;
       
@@ -1515,7 +1654,6 @@
       }
     }
 
-    // Cash: 預かり金額の入力チェック（お釣りはここでは計算のみ保持し、表示は次の画面で行う）
     function checkCashReceivedInput() {
       const total = currentOrder.reduce((acc, i) => acc + (i.price * i.quantity), 0);
       const val = parseFloat(document.getElementById('inputReceivedCash').value) || 0;
@@ -1553,7 +1691,6 @@
       reader.readAsDataURL(file);
     }
 
-    // スリップ写真の確認完了：Confirm OKを押したらそのままTip画面へ直行
     function confirmSlipPhoto() {
       if (!slipImageBase64) return;
       isSlipConfirmed = true;
@@ -1581,7 +1718,6 @@
       const cashDirectBlock = document.getElementById('cashTipDirectBlock');
 
       if (selectedPayment === 'Cash') {
-        // Cash時：特大お釣りボックスを表示
         document.getElementById('tipScreenChangeAmount').innerText = `฿${changeDueAmount}`;
         changeBox.classList.remove('hidden');
         scanBlock.classList.add('hidden');
@@ -1714,7 +1850,6 @@
         }))
       };
 
-      // 1. GASへはバックグラウンド非同期送信
       fetch(GAS_ENDPOINT, {
         method: "POST",
         mode: "no-cors",
@@ -1724,7 +1859,6 @@
         console.error("Background sync error:", err);
       });
 
-      // 2. ちょうど1秒だけ「Processing...」を表示してから完了画面へ切り替え
       setTimeout(() => {
         delete tableSessions[currentTable];
         localStorage.setItem('NC_POS_SESSIONS', JSON.stringify(tableSessions));
@@ -1734,7 +1868,6 @@
         document.getElementById('paymentStepTip').classList.add('hidden');
         document.getElementById('paymentSuccessContent').classList.remove('hidden');
 
-        // 3. 完了画面を3秒間表示してフロアマップへ自動復帰
         setTimeout(() => {
           closePaymentModal();
           renderOrder();

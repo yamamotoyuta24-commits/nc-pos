@@ -1,3 +1,23 @@
+現場では「注文通し（Order）」が何度も発生し、「会計（Payment）」は退店時の1回だけなので、Orderボタンを主役に据える配置はとても理にかなっていますね！
+
+### 今回の変更点
+
+1. **メインの「Order」ボタンを大きく強調**
+* ボタンエリアの右側大半（幅75%以上）を占有させ、押しやすく目立つ青色メインボタンにしました。
+
+
+2. **「Proceed to Payment」ボタンを左側の丸型アイコンボタン化**
+* 左側に丸型の会計ボタン（💳 または ฿ アイコン、濃いオレンジ色）としてコンパクトに配置しました。
+* タップすればこれまで通り会計モーダルが開きます。
+* スマホでもiPadでも誤タップしにくく、頻繁に押す「Order」が片手でも一発で押せるUIに最適化しています。
+
+
+
+---
+
+そのままGitHubの `index.html` に丸ごと貼り替えてCommitしてください。
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -292,32 +312,71 @@
       padding-top: 6px;
     }
 
-    .btn-action-order, .btn-action-pay {
-      flex: 1;
-      padding: 14px 6px;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 800;
-      border: none;
-      cursor: pointer;
-      text-align: center;
-      transition: background 0.15s, opacity 0.15s;
+    /* アクションボタングループ：Orderメイン ＆ Payment丸ボタン左配置 */
+    .action-button-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 6px;
     }
-    .btn-action-order {
-      background: #2563eb;
-      color: #ffffff;
-      box-shadow: 0 3px 5px rgba(37, 99, 235, 0.25);
-    }
-    .btn-action-pay {
+
+    .btn-round-pay {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
       background: #ea580c;
       color: #ffffff;
-      box-shadow: 0 3px 5px rgba(234, 88, 12, 0.25);
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(234, 88, 12, 0.3);
+      flex-shrink: 0;
+      transition: transform 0.1s, opacity 0.15s;
     }
-    .btn-action-order:disabled, .btn-action-pay:disabled {
+    .btn-round-pay:active {
+      transform: scale(0.92);
+    }
+    .btn-round-pay-icon {
+      font-size: 18px;
+      line-height: 1;
+    }
+    .btn-round-pay-label {
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: -0.2px;
+      margin-top: 2px;
+    }
+
+    .btn-main-order {
+      flex: 1;
+      height: 52px;
+      background: #2563eb;
+      color: #ffffff;
+      border: none;
+      border-radius: 14px;
+      font-size: 17px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(37, 99, 235, 0.25);
+      transition: background 0.15s, opacity 0.15s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-main-order:active {
+      transform: scale(0.97);
+    }
+
+    .btn-main-order:disabled, .btn-round-pay:disabled {
       background: #cbd5e1 !important;
       color: #94a3b8 !important;
       box-shadow: none !important;
       cursor: not-allowed;
+      transform: none !important;
     }
 
     /* スマホ専用フローティングカートバー */
@@ -751,19 +810,21 @@
         <span id="totalDisplay" style="color: #ea580c;">฿0</span>
       </div>
 
-      <!-- 横並び50:50ボタン（Order & Proceed to Payment） -->
-      <div style="display: flex; gap: 8px; margin-top: 4px;">
-        <button type="button" onclick="confirmCurrentOrderOnly()" id="btnSendOrder" class="btn-action-order" disabled>
-          Order
+      <!-- 改修：Payment丸ボタン（左） ＆ Orderメインボタン（右） -->
+      <div class="action-button-row">
+        <button type="button" onclick="openPaymentModal()" id="btnCheckout" class="btn-round-pay" title="Proceed to Payment" disabled>
+          <span class="btn-round-pay-icon">💳</span>
+          <span class="btn-round-pay-label">PAY</span>
         </button>
-        <button type="button" onclick="openPaymentModal()" id="btnCheckout" class="btn-action-pay" disabled>
-          Proceed to Payment
+
+        <button type="button" onclick="confirmCurrentOrderOnly()" id="btnSendOrder" class="btn-main-order" disabled>
+          <span>✓ Order</span>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- ==================== 【新規追加】商品タップ時の数量選択ポップアップ ==================== -->
+  <!-- ==================== 商品タップ時の数量選択ポップアップ ==================== -->
   <div id="itemSelectModal" class="modal-overlay hidden">
     <div class="modal-card" style="max-width: 360px; text-align: center;">
       <div class="modal-header">
@@ -775,20 +836,17 @@
         Price: <span id="modalItemPrice" style="color: #ea580c; font-weight: 900;">฿0</span>
       </div>
 
-      <!-- 数量セレクター -->
       <div style="display: flex; justify-content: center; align-items: center; gap: 16px; margin: 16px 0;">
         <button type="button" onclick="changeModalItemQty(-1)" class="btn-qty" style="width: 46px; height: 46px; font-size: 24px;">-</button>
         <span id="modalItemQtyDisplay" style="font-size: 28px; font-weight: 900; min-width: 40px; color: #0f172a;">1</span>
         <button type="button" onclick="changeModalItemQty(1)" class="btn-qty" style="width: 46px; height: 46px; font-size: 24px;">+</button>
       </div>
 
-      <!-- 合計プレビュー -->
       <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 10px 16px;">
         <span style="font-size: 13px; font-weight: 800; color: #64748b;">Subtotal:</span>
         <span id="modalItemSubtotal" style="font-size: 20px; font-weight: 900; color: #ea580c;">฿0</span>
       </div>
 
-      <!-- アクションボタン -->
       <div style="display: flex; gap: 10px; margin-top: 10px;">
         <button type="button" onclick="closeItemSelectModal()" style="flex: 1; background: #e2e8f0; color: #475569; border: none; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer;">
           Cancel
@@ -1337,7 +1395,6 @@
       filtered.forEach(item => {
         const btn = document.createElement('div');
         btn.className = "menu-card";
-        // 即座に追加せず、数量選択ポップアップを開くように変更
         btn.onclick = () => openItemSelectModal(item);
         btn.innerHTML = `
           <div class="menu-name">${item.name}</div>
@@ -1353,7 +1410,7 @@
       renderMenu(cat);
     }
 
-    /* ==================== 【新規】商品数量選択ポップアップ処理 ==================== */
+    /* 商品数量選択ポップアップ処理 */
     function openItemSelectModal(item) {
       pendingModalItem = item;
       pendingModalQty = 1;
@@ -1382,7 +1439,6 @@
       }
     }
 
-    // 「Add to Cart」確定ボタンを押した時の処理
     function confirmAddItemToCart() {
       if (!pendingModalItem) return;
 
@@ -1883,7 +1939,7 @@
       }
     }
 
-    /* ==================== 会計送信（1秒Processing... ➔ 完了 ➔ 3秒でフロアマップ復帰） ==================== */
+    /* 会計送信（1秒Processing... ➔ 完了 ➔ 3秒でフロアマップ復帰） */
     async function submitTransaction() {
       const tipReceiver = document.getElementById('selectTipReceiver').value;
       if (!tipReceiver) {
@@ -1955,3 +2011,5 @@
   </script>
 </body>
 </html>
+
+```

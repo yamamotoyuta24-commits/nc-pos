@@ -10,8 +10,6 @@
       margin: 0;
       padding: 0;
       -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      -webkit-user-select: none;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
     html, body {
@@ -21,12 +19,21 @@
       overflow: hidden;
       background-color: #f1f5f9;
       color: #1e293b;
+      user-select: none;
+      -webkit-user-select: none;
     }
     body {
       display: flex;
       position: relative;
     }
     
+    /* ボタン類のタッチ判定を強制有効化 */
+    button, input, select, .floor-item, .cat-btn, .menu-card, .active-session-badge {
+      touch-action: manipulation;
+      pointer-events: auto !important;
+      cursor: pointer;
+    }
+
     /* 左側メインエリア */
     .main-area {
       flex: 1;
@@ -59,7 +66,6 @@
       border: 1.5px solid #fed7aa;
       padding: 6px 14px;
       border-radius: 10px;
-      cursor: pointer;
     }
     .badge-table {
       font-weight: 900;
@@ -98,7 +104,6 @@
       border-radius: 10px;
       font-size: 14px;
       font-weight: 700;
-      cursor: pointer;
       background: #ffffff;
       color: #475569;
       white-space: nowrap;
@@ -128,7 +133,6 @@
       justify-content: space-between;
       height: 105px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-      cursor: pointer;
       text-align: left;
     }
     .menu-card:active {
@@ -148,7 +152,7 @@
       color: #ea580c;
     }
 
-    /* カートエリア（PC / iPad） */
+    /* カートエリア */
     .cart-area {
       width: 350px;
       background: #ffffff;
@@ -180,7 +184,6 @@
       color: #ef4444;
       font-size: 13px;
       font-weight: 700;
-      cursor: pointer;
     }
     .btn-close-sp-cart {
       display: none;
@@ -188,7 +191,6 @@
       border: none;
       font-size: 24px;
       color: #64748b;
-      cursor: pointer;
     }
 
     .cart-items {
@@ -235,7 +237,6 @@
       border-radius: 6px;
       font-size: 16px;
       font-weight: 700;
-      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -256,7 +257,6 @@
       border-radius: 8px;
       font-size: 12px;
       font-weight: 800;
-      cursor: pointer;
     }
     .btn-item-cancel:active {
       background: #ef4444;
@@ -298,7 +298,6 @@
       font-size: 15px;
       font-weight: 800;
       border: none;
-      cursor: pointer;
       text-align: center;
       transition: background 0.15s, opacity 0.15s;
     }
@@ -335,7 +334,6 @@
       align-items: center;
       font-size: 16px;
       font-weight: 800;
-      cursor: pointer;
       z-index: 40;
     }
 
@@ -359,9 +357,9 @@
       padding: 22px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-      max-height: 94vh;
+      max-height: 90vh;
       overflow-y: auto;
     }
     .modal-header {
@@ -369,19 +367,21 @@
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid #e2e8f0;
-      padding-bottom: 8px;
+      padding-bottom: 10px;
+      position: relative;
+      z-index: 20;
     }
 
-    /* キャンバス高さを360pxに拡大して余白を確保 */
     .floor-canvas-container {
       position: relative;
       width: 100%;
-      height: 360px;
+      height: 320px;
       background: #f8fafc;
       border: 2px dashed #cbd5e1;
       border-radius: 16px;
       overflow: hidden;
       touch-action: none;
+      z-index: 10;
     }
     .floor-canvas-container.editing {
       border: 2px solid #ea580c;
@@ -393,42 +393,37 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      border-radius: 10px;
+      border-radius: 12px;
       font-weight: 800;
-      cursor: pointer;
       box-shadow: 0 2px 4px rgba(0,0,0,0.06);
       transition: transform 0.1s, box-shadow 0.1s;
-      user-select: none;
     }
-    /* カウンター席（52x52pxのコンパクト丸型） */
     .floor-item.bar-seat {
-      width: 52px;
-      height: 52px;
+      width: 64px;
+      height: 64px;
       background: #ffffff;
       border: 2px solid #94a3b8;
       color: #334155;
-      font-size: 11px;
+      font-size: 13px;
       border-radius: 50%;
     }
-    /* テーブル席（68x56pxのすっきり角丸型） */
     .floor-item.table-seat {
-      width: 68px;
-      height: 56px;
+      width: 84px;
+      height: 70px;
       background: #ffffff;
       border: 2px solid #3b82f6;
       color: #1e3a8a;
-      font-size: 12px;
-      border-radius: 10px;
+      font-size: 14px;
+      border-radius: 12px;
     }
-    /* Training席（44x44px） */
     .floor-item.training-seat {
-      width: 44px;
-      height: 44px;
+      width: 52px;
+      height: 52px;
       background: #f1f5f9;
-      border: 1.5px dashed #64748b;
+      border: 2px dashed #64748b;
       color: #475569;
-      font-size: 9px;
-      border-radius: 8px;
+      font-size: 10px;
+      border-radius: 10px;
     }
     .floor-item.selected {
       border-color: #ea580c !important;
@@ -436,7 +431,7 @@
       color: #ffffff !important;
       transform: scale(1.06);
       box-shadow: 0 6px 12px rgba(234, 88, 12, 0.3);
-      z-index: 10;
+      z-index: 15;
     }
     .floor-item.dragging {
       opacity: 0.8;
@@ -448,50 +443,50 @@
       border-color: #ef4444 !important;
       color: #991b1b !important;
     }
+    
+    /* ツールバーのタップ領域を最優先化 */
     .edit-toolbar {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 4px 0;
       gap: 8px;
+      position: relative;
+      z-index: 30;
     }
     .btn-edit-mode {
       background: #f1f5f9;
-      border: 1px solid #cbd5e1;
-      padding: 6px 14px;
-      border-radius: 8px;
+      border: 1.5px solid #cbd5e1;
+      padding: 8px 14px;
+      border-radius: 10px;
       font-size: 13px;
-      font-weight: 700;
-      color: #475569;
-      cursor: pointer;
+      font-weight: 800;
+      color: #334155;
+      pointer-events: auto !important;
+      touch-action: manipulation;
     }
     .btn-edit-mode.active {
-      background: #ea580c;
-      color: #ffffff;
-      border-color: #ea580c;
+      background: #ea580c !important;
+      color: #ffffff !important;
+      border-color: #ea580c !important;
     }
 
     .btn-delete-table-info {
       background: #fff1f2;
       border: 1.5px solid #fecdd3;
-      padding: 6px 12px;
-      border-radius: 8px;
+      padding: 8px 12px;
+      border-radius: 10px;
       font-size: 13px;
       font-weight: 800;
       color: #e11d48;
-      cursor: pointer;
-    }
-    .btn-delete-table-info:active {
-      background: #e11d48;
-      color: #fff;
+      pointer-events: auto !important;
+      touch-action: manipulation;
     }
 
     .input-customer {
       width: 100%;
       border: 2px solid #cbd5e1;
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-size: 14px;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 15px;
       font-weight: 600;
       color: #1e293b;
       outline: none;
@@ -507,24 +502,21 @@
       background: #ea580c;
       color: #ffffff;
       border: none;
-      padding: 14px;
+      padding: 15px;
       border-radius: 12px;
-      font-size: 17px;
+      font-size: 18px;
       font-weight: 800;
-      cursor: pointer;
-      margin-top: 4px;
     }
 
     .nat-btn {
       flex: 1;
-      padding: 8px 4px;
+      padding: 10px 4px;
       background: #f8fafc;
       border: 2px solid #cbd5e1;
-      border-radius: 8px;
-      font-size: 12px;
+      border-radius: 10px;
+      font-size: 13px;
       font-weight: 800;
       color: #475569;
-      cursor: pointer;
       text-align: center;
     }
     .nat-btn.selected {
@@ -538,7 +530,6 @@
       border: none;
       font-size: 26px;
       color: #94a3b8;
-      cursor: pointer;
     }
     .pay-methods {
       display: grid;
@@ -553,7 +544,6 @@
       font-size: 16px;
       font-weight: 700;
       color: #334155;
-      cursor: pointer;
     }
     .btn-pay-method.selected {
       border-color: #ea580c;
@@ -631,11 +621,11 @@
         display: flex;
       }
       .modal-card {
-        padding: 14px;
-        max-height: 96vh;
+        padding: 16px;
+        max-height: 94vh;
       }
       .floor-canvas-container {
-        height: 300px;
+        height: 250px;
       }
     }
   </style>
@@ -647,14 +637,14 @@
     <div class="modal-card">
       <div class="modal-header">
         <div>
-          <h3 style="font-size: 17px; font-weight: 900; color: #0f172a;">Floor Map & Table Select</h3>
-          <p style="font-size: 11px; color: #64748b; font-weight: 600;">Tap seat to select, or edit layout</p>
+          <h3 style="font-size: 17px; font-weight: 900; color: #0f172a;">Floor Map & Table</h3>
+          <p style="font-size: 11px; color: #64748b; font-weight: 600;">Tap seat to select</p>
         </div>
         <div class="edit-toolbar">
           <button type="button" onclick="confirmDeleteTableInfoModal()" class="btn-delete-table-info">
             🗑 Delete
           </button>
-          <button id="btnToggleEdit" onclick="toggleEditMode()" class="btn-edit-mode">
+          <button type="button" id="btnToggleEdit" onclick="toggleEditMode()" class="btn-edit-mode">
             ⚙ Edit
           </button>
         </div>
@@ -664,42 +654,33 @@
       <div id="floorCanvas" class="floor-canvas-container"></div>
 
       <!-- 編集モードツールボタン -->
-      <div id="editToolsBlock" class="hidden" style="display: flex; gap: 8px;">
-        <button onclick="addNewSeat('Bar')" style="flex: 1; background: #f8fafc; border: 1.5px solid #cbd5e1; padding: 6px; border-radius: 8px; font-weight: 700; font-size: 12px;">+ Add Bar</button>
-        <button onclick="addNewSeat('Table')" style="flex: 1; background: #f8fafc; border: 1.5px solid #cbd5e1; padding: 6px; border-radius: 8px; font-weight: 700; font-size: 12px;">+ Add Table</button>
-        <button onclick="resetDefaultLayout()" style="background: #fee2e2; border: 1px solid #f87171; color: #b91c1c; padding: 6px 10px; border-radius: 8px; font-weight: 700; font-size: 12px;">Reset</button>
+      <div id="editToolsBlock" class="hidden" style="display: flex; gap: 8px; position: relative; z-index: 25;">
+        <button type="button" onclick="addNewSeat('Bar')" style="flex: 1; background: #f8fafc; border: 1.5px solid #cbd5e1; padding: 10px; border-radius: 10px; font-weight: 800; font-size: 13px;">+ Add Bar</button>
+        <button type="button" onclick="addNewSeat('Table')" style="flex: 1; background: #f8fafc; border: 1.5px solid #cbd5e1; padding: 10px; border-radius: 10px; font-weight: 800; font-size: 13px;">+ Add Table</button>
+        <button type="button" onclick="resetDefaultLayout()" style="background: #fee2e2; border: 1px solid #f87171; color: #b91c1c; padding: 10px 14px; border-radius: 10px; font-weight: 800; font-size: 13px;">Reset</button>
       </div>
 
-      <!-- 担当スタッフ選択プルダウン（追加） ＆ 客名入力 -->
-      <div style="display: flex; gap: 10px;">
-        <div style="flex: 1.2;">
-          <label style="display: block; font-size: 11px; font-weight: 800; color: #475569; margin-bottom: 4px;">
-            Staff in Charge <span style="color: #ef4444;">*</span>
-          </label>
-          <select id="selectStartStaff" onchange="checkStartOrderValidation()" style="width: 100%; border: 2px solid #cbd5e1; border-radius: 10px; padding: 10px; font-size: 13px; font-weight: 700; color: #1e293b; background: #fff; outline: none;">
-          </select>
-        </div>
-        <div style="flex: 1.8;">
-          <label style="display: block; font-size: 11px; font-weight: 800; color: #475569; margin-bottom: 4px;">Customer / Guest Name</label>
-          <input type="text" id="inputCustomerName" class="input-customer" placeholder="Guest name..." autocomplete="off">
-        </div>
+      <!-- 客名入力 -->
+      <div>
+        <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 4px;">Customer / Guest Name</label>
+        <input type="text" id="inputCustomerName" class="input-customer" placeholder="Enter guest name or note..." autocomplete="off">
       </div>
 
       <!-- 人数 & 国籍選択（必須項目） -->
       <div style="display: flex; gap: 10px;">
         <div style="flex: 1;">
-          <label style="display: block; font-size: 11px; font-weight: 800; color: #475569; margin-bottom: 4px;">
+          <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 4px;">
             Guests <span style="color: #ef4444;">*</span>
           </label>
           <div style="display: flex; align-items: center; gap: 4px;">
-            <button type="button" onclick="changeGuestCount(-1)" class="btn-qty" style="width: 30px; height: 30px; font-size: 15px;">-</button>
-            <input type="number" id="inputGuestCount" min="1" max="20" value="1" readonly style="width: 100%; text-align: center; font-size: 15px; font-weight: 800; border: 2px solid #cbd5e1; border-radius: 8px; height: 30px; background: #fff;">
-            <button type="button" onclick="changeGuestCount(1)" class="btn-qty" style="width: 30px; height: 30px; font-size: 15px;">+</button>
+            <button type="button" onclick="changeGuestCount(-1)" class="btn-qty" style="width: 32px; height: 32px; font-size: 16px;">-</button>
+            <input type="number" id="inputGuestCount" min="1" max="20" value="1" readonly style="width: 100%; text-align: center; font-size: 16px; font-weight: 800; border: 2px solid #cbd5e1; border-radius: 8px; height: 32px; background: #fff;">
+            <button type="button" onclick="changeGuestCount(1)" class="btn-qty" style="width: 32px; height: 32px; font-size: 16px;">+</button>
           </div>
         </div>
 
         <div style="flex: 2;">
-          <label style="display: block; font-size: 11px; font-weight: 800; color: #475569; margin-bottom: 4px;">
+          <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 4px;">
             Nationality <span style="color: #ef4444;">*</span>
           </label>
           <div style="display: flex; gap: 4px;">
@@ -710,7 +691,7 @@
         </div>
       </div>
 
-      <button onclick="confirmTableAndGuest()" class="btn-start-order">
+      <button type="button" onclick="confirmTableAndGuest()" class="btn-start-order">
         Start Order ➔
       </button>
     </div>
@@ -722,11 +703,11 @@
       <h3 style="font-size: 18px; font-weight: 900; color: #0f172a;">Manager PIN Required</h3>
       <p style="font-size: 12px; font-weight: 700; color: #64748b;">Enter PIN to unlock Training Mode</p>
       
-      <input type="password" id="inputManagerPin" maxlength="4" pattern="[0-9]*" inputmode="numeric" placeholder="****" style="width: 100%; text-align: center; font-size: 28px; letter-spacing: 12px; font-weight: 900; padding: 12px; border: 2px solid #cbd5e1; border-radius: 12px; outline: none; margin: 10px 0;">
+      <input type="password" id="inputManagerPin" maxlength="4" pattern="[0-9]*" inputmode="numeric" placeholder="****" style="width: 100%; text-align: center; font-size: 28px; letter-spacing: 12px; font-weight: 900; padding: 12px; border: 2px solid #cbd5e1; border-radius: 12px; outline: none; margin: 10px 0; user-select: text !important; -webkit-user-select: text !important;">
       
       <div style="display: flex; gap: 8px;">
-        <button type="button" onclick="closePinModal()" style="flex: 1; background: #e2e8f0; color: #475569; border: none; padding: 12px; border-radius: 10px; font-weight: 800; cursor: pointer;">Cancel</button>
-        <button type="button" onclick="verifyManagerPin()" style="flex: 1.2; background: #ea580c; color: #ffffff; border: none; padding: 12px; border-radius: 10px; font-weight: 800; cursor: pointer;">Unlock</button>
+        <button type="button" onclick="closePinModal()" style="flex: 1; background: #e2e8f0; color: #475569; border: none; padding: 12px; border-radius: 10px; font-weight: 800;">Cancel</button>
+        <button type="button" onclick="verifyManagerPin()" style="flex: 1.2; background: #ea580c; color: #ffffff; border: none; padding: 12px; border-radius: 10px; font-weight: 800;">Unlock</button>
       </div>
     </div>
   </div>
@@ -746,18 +727,18 @@
 
     <!-- Category Tabs -->
     <div class="cat-bar" id="categoryTabs">
-      <button class="cat-btn active" onclick="filterCategory('All', this)">ALL</button>
-      <button class="cat-btn" onclick="filterCategory('Beer', this)">Beer</button>
-      <button class="cat-btn" onclick="filterCategory('Cocktail', this)">Cocktail</button>
-      <button class="cat-btn" onclick="filterCategory('Food', this)">Food</button>
-      <button class="cat-btn" onclick="filterCategory('Other', this)">Other</button>
+      <button type="button" class="cat-btn active" onclick="filterCategory('All', this)">ALL</button>
+      <button type="button" class="cat-btn" onclick="filterCategory('Beer', this)">Beer</button>
+      <button type="button" class="cat-btn" onclick="filterCategory('Cocktail', this)">Cocktail</button>
+      <button type="button" class="cat-btn" onclick="filterCategory('Food', this)">Food</button>
+      <button type="button" class="cat-btn" onclick="filterCategory('Other', this)">Other</button>
     </div>
 
     <!-- Menu Grid -->
     <div class="menu-container" id="menuGrid"></div>
   </div>
 
-  <!-- スマホ用：下部フローティングカートバー -->
+  <!-- スマホ用フローティングカートバー -->
   <div class="sp-cart-floating-btn" id="spCartBar" onclick="toggleSpCart(true)">
     <span>🛒 View Order (<span id="spCartCount">0</span>)</span>
     <span id="spCartTotal">฿0</span>
@@ -767,10 +748,10 @@
   <div class="cart-area" id="cartSidebar">
     <div class="cart-header">
       <div style="display: flex; align-items: center; gap: 8px;">
-        <button onclick="toggleSpCart(false)" class="btn-close-sp-cart">&times;</button>
+        <button type="button" onclick="toggleSpCart(false)" class="btn-close-sp-cart">&times;</button>
         <span class="cart-title">Order Details</span>
       </div>
-      <button onclick="clearCurrentOrder()" class="btn-clear">Clear All</button>
+      <button type="button" onclick="clearCurrentOrder()" class="btn-clear">Clear All</button>
     </div>
 
     <div class="cart-items" id="orderItemsContainer">
@@ -787,7 +768,6 @@
         <span id="totalDisplay" style="color: #ea580c;">฿0</span>
       </div>
 
-      <!-- 横並び50:50ボタン -->
       <div style="display: flex; gap: 8px; margin-top: 4px;">
         <button type="button" onclick="confirmCurrentOrderOnly()" id="btnSendOrder" class="btn-action-order" disabled>
           Order
@@ -805,7 +785,7 @@
       <div id="orderConfirmContent">
         <div class="modal-header">
           <h3 style="font-size: 18px; font-weight: 800;">Confirm Order?</h3>
-          <button onclick="closeOrderConfirmModal()" class="btn-close-modal">&times;</button>
+          <button type="button" onclick="closeOrderConfirmModal()" class="btn-close-modal">&times;</button>
         </div>
 
         <div style="font-size: 13px; font-weight: 700; color: #64748b; margin-top: 6px;">
@@ -821,10 +801,10 @@
         </div>
 
         <div style="display: flex; gap: 10px; margin-top: 12px;">
-          <button type="button" onclick="closeOrderConfirmModal()" style="flex: 1; background: #e2e8f0; color: #475569; border: none; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer;">
+          <button type="button" onclick="closeOrderConfirmModal()" style="flex: 1; background: #e2e8f0; color: #475569; border: none; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 800;">
             Back
           </button>
-          <button type="button" onclick="executeFinalOrder()" style="flex: 1.2; background: #2563eb; color: #ffffff; border: none; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; box-shadow: 0 3px 5px rgba(37,99,235,0.25);">
+          <button type="button" onclick="executeFinalOrder()" style="flex: 1.2; background: #2563eb; color: #ffffff; border: none; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 800; box-shadow: 0 3px 5px rgba(37,99,235,0.25);">
             Confirm Order
           </button>
         </div>
@@ -844,7 +824,7 @@
       <div id="deleteTableInfoContent">
         <div class="modal-header">
           <h3 style="font-size: 18px; font-weight: 800; color: #e11d48;">Delete This Table Info?</h3>
-          <button onclick="closeDeleteTableInfoModal()" class="btn-close-modal">&times;</button>
+          <button type="button" onclick="closeDeleteTableInfoModal()" class="btn-close-modal">&times;</button>
         </div>
 
         <div style="font-size: 14px; font-weight: 700; color: #334155; margin-top: 8px;">
@@ -863,10 +843,10 @@
         </p>
 
         <div style="display: flex; gap: 10px; margin-top: 12px;">
-          <button type="button" onclick="closeDeleteTableInfoModal()" style="flex: 1; background: #e2e8f0; color: #475569; border: none; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer;">
+          <button type="button" onclick="closeDeleteTableInfoModal()" style="flex: 1; background: #e2e8f0; color: #475569; border: none; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 800;">
             Back
           </button>
-          <button type="button" onclick="executeDeleteTableInfo()" style="flex: 1.2; background: #e11d48; color: #ffffff; border: none; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer;">
+          <button type="button" onclick="executeDeleteTableInfo()" style="flex: 1.2; background: #e11d48; color: #ffffff; border: none; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 800;">
             Confirm Delete
           </button>
         </div>
@@ -884,11 +864,10 @@
   <div id="paymentModal" class="modal-overlay hidden">
     <div class="modal-card" style="max-width: 480px;">
       
-      <!-- ステップ1: 会計担当者選択 ＆ 決済選択画面 -->
       <div id="paymentStepSelect">
         <div class="modal-header">
           <h3 style="font-size: 18px; font-weight: 800;">Payment Checkout</h3>
-          <button onclick="closePaymentModal()" class="btn-close-modal">&times;</button>
+          <button type="button" onclick="closePaymentModal()" class="btn-close-modal">&times;</button>
         </div>
 
         <div style="text-align: center; margin-top: 4px;">
@@ -896,7 +875,6 @@
           <div style="font-size: 32px; font-weight: 900; color: #ea580c;" id="modalTotalDisplay">฿0</div>
         </div>
 
-        <!-- 会計者（Cashier）選択プルダウン -->
         <div style="margin-top: 10px;">
           <label style="display: block; font-size: 13px; font-weight: 800; color: #1e293b; margin-bottom: 4px;">
             Cashier <span style="color: #ef4444;">*</span>
@@ -905,27 +883,24 @@
           </select>
         </div>
 
-        <!-- 決済方法選択 -->
         <div style="margin-top: 12px;">
           <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 6px;">Payment Method</label>
           <div class="pay-methods">
-            <button onclick="selectMethod('Cash')" id="btnMethodCash" class="btn-pay-method" disabled>Cash</button>
-            <button onclick="selectMethod('Scan')" id="btnMethodPP" class="btn-pay-method" disabled>Scan</button>
+            <button type="button" onclick="selectMethod('Cash')" id="btnMethodCash" class="btn-pay-method" disabled>Cash</button>
+            <button type="button" onclick="selectMethod('Scan')" id="btnMethodPP" class="btn-pay-method" disabled>Scan</button>
           </div>
         </div>
 
-        <!-- Cash入力領域 -->
         <div id="cashArea" class="hidden" style="border-top: 1px solid #e2e8f0; padding-top: 14px; margin-top: 12px; display: flex; flex-direction: column; gap: 12px;">
           <div>
             <label style="display: block; font-size: 13px; font-weight: 800; color: #475569; margin-bottom: 6px;">Received Amount (฿) <span style="color: #ef4444;">*</span></label>
             <input type="number" id="inputReceivedCash" oninput="checkCashReceivedInput()" placeholder="0" style="width: 100%; border: 2px solid #cbd5e1; border-radius: 12px; padding: 14px; font-size: 22px; font-weight: 800; color: #1e293b; outline: none; user-select: text !important; -webkit-user-select: text !important;">
           </div>
-          <button id="btnProceedCashTip" onclick="proceedToTipScreen()" style="width: 100%; background: #cbd5e1; color: #64748b; border: none; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: 800; cursor: not-allowed;" disabled>
+          <button type="button" id="btnProceedCashTip" onclick="proceedToTipScreen()" style="width: 100%; background: #cbd5e1; color: #64748b; border: none; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: 800;" disabled>
             Next: Change & Tip ➔
           </button>
         </div>
 
-        <!-- Scan 領域 -->
         <div id="promptPayArea" class="hidden" style="border-top: 1px solid #e2e8f0; padding-top: 14px; margin-top: 12px; display: flex; flex-direction: column; gap: 12px;">
           <div style="text-align: center;">
             <p style="font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 6px;">Present QR to Customer</p>
@@ -936,7 +911,7 @@
             <input type="file" accept="image/*" capture="environment" id="cameraInput" style="display: none;" onchange="handleSlipCapture(event)">
             
             <div id="cameraActionBlock">
-              <button onclick="document.getElementById('cameraInput').click()" style="background: #2563eb; color: #ffffff; border: none; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer;">
+              <button type="button" onclick="document.getElementById('cameraInput').click()" style="background: #2563eb; color: #ffffff; border: none; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 700;">
                 📷 Take Photo of Slip
               </button>
             </div>
@@ -946,14 +921,14 @@
                 <img id="slipPreviewImg" style="max-height: 140px; max-width: 100%; object-fit: contain; border-radius: 6px;" alt="Preview">
               </div>
               <div style="display: flex; gap: 8px;">
-                <button onclick="document.getElementById('cameraInput').click()" style="flex: 1; background: #e2e8f0; border: none; padding: 10px; border-radius: 8px; font-weight: 700; font-size: 13px;">Retake</button>
-                <button type="button" onclick="confirmSlipPhoto()" id="btnConfirmSlip" style="flex: 1; background: #16a34a; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer;">Confirm OK</button>
+                <button type="button" onclick="document.getElementById('cameraInput').click()" style="flex: 1; background: #e2e8f0; border: none; padding: 10px; border-radius: 8px; font-weight: 700; font-size: 13px;">Retake</button>
+                <button type="button" onclick="confirmSlipPhoto()" id="btnConfirmSlip" style="flex: 1; background: #16a34a; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; font-size: 13px;">Confirm OK</button>
               </div>
             </div>
           </div>
 
           <div style="border-top: 1px solid #e2e8f0; padding-top: 10px;">
-            <button type="button" id="btnProceedScanTip" onclick="proceedToTipScreen()" style="width: 100%; background: #cbd5e1; color: #64748b; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 800; cursor: not-allowed;" disabled>
+            <button type="button" id="btnProceedScanTip" onclick="proceedToTipScreen()" style="width: 100%; background: #cbd5e1; color: #64748b; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 800;" disabled>
               Proceed to Tip ➔
             </button>
           </div>
@@ -1012,16 +987,16 @@
         </div>
 
         <div style="margin-top: 16px; display: flex; gap: 8px;">
-          <button type="button" onclick="backToPaymentSelect()" style="flex: 1; background: #e2e8f0; color: #475569; border: none; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer;">
+          <button type="button" onclick="backToPaymentSelect()" style="flex: 1; background: #e2e8f0; color: #475569; border: none; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 800;">
             Back
           </button>
-          <button id="btnCompleteTransaction" onclick="submitTransaction()" style="flex: 1.6; background: #cbd5e1; color: #64748b; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 800; cursor: not-allowed;" disabled>
+          <button type="button" id="btnCompleteTransaction" onclick="submitTransaction()" style="flex: 1.6; background: #cbd5e1; color: #64748b; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 800;" disabled>
             Complete
           </button>
         </div>
       </div>
 
-      <!-- ステップ3: 会計完了メッセージブロック（3秒後にフロアマップへ自動遷移） -->
+      <!-- ステップ3: 会計完了メッセージブロック -->
       <div id="paymentSuccessContent" class="hidden" style="text-align: center; padding: 26px 10px;">
         <div style="font-size: 54px; margin-bottom: 12px;">🎉</div>
         <h3 style="font-size: 22px; font-weight: 900; color: #16a34a; margin-bottom: 6px;">Payment Completed!</h3>
@@ -1035,21 +1010,16 @@
     const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwTQxVoIEsO-y3GUxrD_1MUbCszDfiC1RpMGhsQVAmwZqdxBRTwQqBrLdMVW-TP4kgBrQ/exec";
     const MANAGER_PIN = "1536";
 
-    // カウンター4席 + テーブル5席 + Training席の最適化初期レイアウト
     const DEFAULT_LAYOUT = [
-      // カウンター（上部に横一列）
-      { id: "Bar-1", label: "Bar-1", type: "bar-seat", x: 20, y: 20 },
-      { id: "Bar-2", label: "Bar-2", type: "bar-seat", x: 84, y: 20 },
-      { id: "Bar-3", label: "Bar-3", type: "bar-seat", x: 148, y: 20 },
-      { id: "Bar-4", label: "Bar-4", type: "bar-seat", x: 212, y: 20 },
-      // テーブル5席（右列と下段にすっきり配置）
-      { id: "T-1", label: "T-1", type: "table-seat", x: 300, y: 20 },
-      { id: "T-2", label: "T-2", type: "table-seat", x: 300, y: 90 },
-      { id: "T-3", label: "T-3", type: "table-seat", x: 300, y: 160 },
-      { id: "T-4", label: "T-4", type: "table-seat", x: 110, y: 110 },
-      { id: "T-5", label: "T-5", type: "table-seat", x: 110, y: 185 },
-      // Training専用席（左下端に小さく配置）
-      { id: "Training", label: "🔒 Train", type: "training-seat", x: 20, y: 270 }
+      { id: "Bar-1", label: "Bar-1", type: "bar-seat", x: 30, y: 30 },
+      { id: "Bar-2", label: "Bar-2", type: "bar-seat", x: 110, y: 30 },
+      { id: "Bar-3", label: "Bar-3", type: "bar-seat", x: 190, y: 30 },
+      { id: "Bar-4", label: "Bar-4", type: "bar-seat", x: 270, y: 30 },
+      { id: "T-1", label: "Table-1", type: "table-seat", x: 400, y: 30 },
+      { id: "T-2", label: "Table-2", type: "table-seat", x: 400, y: 130 },
+      { id: "T-3", label: "Table-3", type: "table-seat", x: 400, y: 230 },
+      { id: "T-4", label: "Table-4", type: "table-seat", x: 150, y: 180 },
+      { id: "Training", label: "🔒 Training", type: "training-seat", x: 20, y: 240 }
     ];
 
     const DEFAULT_STAFF_LIST = [
@@ -1063,12 +1033,8 @@
     let tableSessions = JSON.parse(localStorage.getItem('NC_POS_SESSIONS')) || {};
     let currentLayout = JSON.parse(localStorage.getItem('NC_POS_LAYOUT')) || DEFAULT_LAYOUT;
     
-    // T-5やTrainingが未登録の古いストレージデータがある場合は補完
-    if (!currentLayout.some(s => s.id === "T-5")) {
-      currentLayout.push({ id: "T-5", label: "T-5", type: "table-seat", x: 110, y: 185 });
-    }
     if (!currentLayout.some(s => s.id === "Training")) {
-      currentLayout.push({ id: "Training", label: "🔒 Train", type: "training-seat", x: 20, y: 270 });
+      currentLayout.push({ id: "Training", label: "🔒 Training", type: "training-seat", x: 20, y: 240 });
     }
 
     let isEditingLayout = false;
@@ -1076,7 +1042,6 @@
     let currentCustomer = "";
     let selectedNationality = null;
     let guestCount = 1;
-    let selectedStartStaff = "";
 
     const MENU_ITEMS = [
       { id: "M01", name: "Singha Beer", category: "Beer", price: 120 },
@@ -1112,48 +1077,6 @@
       }
     }
 
-    /* スタッフプルダウンの初期化（Start Order用・Cashier用・Tip用） */
-    function populateAllStaffDropdowns() {
-      // 1. テーブル開始時の担当スタッフ用
-      const startStaffSel = document.getElementById('selectStartStaff');
-      if (startStaffSel) {
-        startStaffSel.innerHTML = '<option value="" disabled selected>-- Select Staff --</option>';
-        staffList.filter(s => s.id !== 'store').forEach(st => {
-          const opt = document.createElement('option');
-          opt.value = st.name;
-          opt.innerText = st.name;
-          startStaffSel.appendChild(opt);
-        });
-      }
-
-      // 2. 会計Cashier用
-      const cashierSel = document.getElementById('selectCashier');
-      if (cashierSel) {
-        cashierSel.innerHTML = '<option value="" disabled selected>-- Select Cashier --</option>';
-        staffList.filter(s => s.id !== 'store').forEach(st => {
-          const opt = document.createElement('option');
-          opt.value = st.name;
-          opt.innerText = st.name;
-          cashierSel.appendChild(opt);
-        });
-      }
-
-      // 3. Tip受取用
-      const tipSel = document.getElementById('selectTipReceiver');
-      if (tipSel) {
-        tipSel.innerHTML = `
-          <option value="" disabled selected>-- Select Receiver --</option>
-          <option value="No Tip">No Tip</option>
-        `;
-        staffList.forEach(st => {
-          const opt = document.createElement('option');
-          opt.value = st.name;
-          opt.innerText = st.name;
-          tipSel.appendChild(opt);
-        });
-      }
-    }
-
     function renderFloorMap() {
       const canvas = document.getElementById('floorCanvas');
       canvas.innerHTML = '';
@@ -1173,7 +1096,7 @@
         if (isOccupied) {
           displayName = (session && session.customerName && session.customerName.trim() !== '') ? session.customerName : 'GUEST';
         }
-        div.innerHTML = `<span>${seat.label}</span>${displayName ? `<span style="font-size:9px; font-weight:700; opacity:0.9; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:90%;">${displayName}</span>` : ''}`;
+        div.innerHTML = `<span>${seat.label}</span>${displayName ? `<span style="font-size:10px; font-weight:700; opacity:0.9; margin-top:2px;">${displayName}</span>` : ''}`;
 
         div.onclick = (e) => {
           if (isEditingLayout) {
@@ -1202,7 +1125,6 @@
     function selectSeat(seatId) {
       currentTable = seatId;
       const existingSession = tableSessions[currentTable];
-      
       currentCustomer = existingSession ? existingSession.customerName : "";
       document.getElementById('inputCustomerName').value = currentCustomer;
       
@@ -1215,11 +1137,6 @@
         const btn = document.getElementById(`nat-${selectedNationality}`);
         if (btn) btn.classList.add('selected');
       }
-
-      // 既存セッションの担当スタッフを復元
-      selectedStartStaff = (existingSession && existingSession.staffInCharge) ? existingSession.staffInCharge : "";
-      document.getElementById('selectStartStaff').value = selectedStartStaff;
-
       checkStartOrderValidation();
       renderFloorMap();
     }
@@ -1242,9 +1159,829 @@
         currentCustomer = "Staff Training";
         selectedNationality = "Thai";
         guestCount = 1;
-        selectedStartStaff = "Manager";
         
         tableSessions["Training"] = {
           customerName: "Staff Training",
           guestCount: 1,
           nationality: "Thai",
+          orderItems: tableSessions["Training"]?.orderItems || [],
+          active: true
+        };
+        localStorage.setItem('NC_POS_SESSIONS', JSON.stringify(tableSessions));
+        currentOrder = tableSessions["Training"].orderItems || [];
+
+        document.getElementById('headerTable').innerText = "Training";
+        document.getElementById('headerCustomer').innerText = "Staff Training (🔒)";
+        document.getElementById('sessionModal').classList.add('hidden');
+        renderOrder();
+      } else {
+        alert("Incorrect PIN code.");
+        document.getElementById('inputManagerPin').value = '';
+      }
+    }
+
+    function attachDragListener(el, seat) {
+      let isDragging = false;
+      let startX, startY, origX, origY;
+
+      const onStart = (clientX, clientY) => {
+        if (!isEditingLayout) return;
+        isDragging = true;
+        el.classList.add('dragging');
+        startX = clientX;
+        startY = clientY;
+        origX = seat.x;
+        origY = seat.y;
+      };
+
+      const onMove = (clientX, clientY) => {
+        if (!isDragging) return;
+        const dx = clientX - startX;
+        const dy = clientY - startY;
+        const canvas = document.getElementById('floorCanvas');
+        const maxX = canvas.clientWidth - el.offsetWidth;
+        const maxY = canvas.clientHeight - el.offsetHeight;
+
+        seat.x = Math.max(5, Math.min(maxX - 5, origX + dx));
+        seat.y = Math.max(5, Math.min(maxY - 5, origY + dy));
+
+        el.style.left = `${seat.x}px`;
+        el.style.top = `${seat.y}px`;
+      };
+
+      const onEnd = () => {
+        if (!isDragging) return;
+        isDragging = false;
+        el.classList.remove('dragging');
+        saveLayoutToStorage();
+      };
+
+      el.addEventListener('touchstart', (e) => onStart(e.touches[0].clientX, e.touches[0].clientY), { passive: false });
+      window.addEventListener('touchmove', (e) => onMove(e.touches[0].clientX, e.touches[0].clientY), { passive: false });
+      window.addEventListener('touchend', onEnd);
+
+      el.addEventListener('mousedown', (e) => onStart(e.clientX, e.clientY));
+      window.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY));
+      window.addEventListener('mouseup', onEnd);
+    }
+
+    /* 確実に発火するレイアウト編集トグル */
+    function toggleEditMode() {
+      isEditingLayout = !isEditingLayout;
+      const btn = document.getElementById('btnToggleEdit');
+      const canvas = document.getElementById('floorCanvas');
+      const tools = document.getElementById('editToolsBlock');
+
+      if (isEditingLayout) {
+        btn.innerText = "✓ Done";
+        btn.classList.add('active');
+        canvas.classList.add('editing');
+        tools.classList.remove('hidden');
+      } else {
+        btn.innerText = "⚙ Edit";
+        btn.classList.remove('active');
+        canvas.classList.remove('editing');
+        tools.classList.add('hidden');
+        saveLayoutToStorage();
+      }
+    }
+
+    function saveLayoutToStorage() {
+      localStorage.setItem('NC_POS_LAYOUT', JSON.stringify(currentLayout));
+    }
+
+    function addNewSeat(type) {
+      const count = currentLayout.filter(s => s.type === (type === 'Bar' ? 'bar-seat' : 'table-seat')).length + 1;
+      const newId = `${type}-${count}`;
+      currentLayout.push({
+        id: newId,
+        label: newId,
+        type: type === 'Bar' ? 'bar-seat' : 'table-seat',
+        x: 40 + (count * 15),
+        y: 80
+      });
+      saveLayoutToStorage();
+      renderFloorMap();
+    }
+
+    function resetDefaultLayout() {
+      if (confirm("Reset floor layout to default?")) {
+        currentLayout = JSON.parse(JSON.stringify(DEFAULT_LAYOUT));
+        saveLayoutToStorage();
+        renderFloorMap();
+      }
+    }
+
+    function changeGuestCount(delta) {
+      guestCount = Math.max(1, Math.min(20, guestCount + delta));
+      document.getElementById('inputGuestCount').value = guestCount;
+      checkStartOrderValidation();
+    }
+
+    function selectNationality(nat) {
+      selectedNationality = nat;
+      document.querySelectorAll('.nat-btn').forEach(btn => btn.classList.remove('selected'));
+      const activeBtn = document.getElementById(`nat-${nat}`);
+      if (activeBtn) activeBtn.classList.add('selected');
+      checkStartOrderValidation();
+    }
+
+    function checkStartOrderValidation() {
+      const btn = document.querySelector('.btn-start-order');
+      if (selectedNationality && guestCount >= 1) {
+        btn.disabled = false;
+        btn.style.opacity = "1";
+        btn.style.cursor = "pointer";
+      } else {
+        btn.disabled = true;
+        btn.style.opacity = "0.4";
+        btn.style.cursor = "not-allowed";
+      }
+    }
+
+    function openSessionModal() {
+      const existingSession = tableSessions[currentTable];
+      document.getElementById('inputCustomerName').value = (existingSession && existingSession.customerName) ? existingSession.customerName : '';
+      
+      guestCount = (existingSession && existingSession.guestCount) ? existingSession.guestCount : 1;
+      document.getElementById('inputGuestCount').value = guestCount;
+
+      selectedNationality = (existingSession && existingSession.nationality) ? existingSession.nationality : null;
+      document.querySelectorAll('.nat-btn').forEach(btn => btn.classList.remove('selected'));
+      if (selectedNationality) {
+        const btn = document.getElementById(`nat-${selectedNationality}`);
+        if (btn) btn.classList.add('selected');
+      }
+
+      checkStartOrderValidation();
+      renderFloorMap();
+      document.getElementById('sessionModal').classList.remove('hidden');
+    }
+
+    function confirmTableAndGuest() {
+      if (!selectedNationality) {
+        alert("Please select Nationality (Thai / Asia / Foreigner)");
+        return;
+      }
+
+      if (isEditingLayout) toggleEditMode();
+
+      const nameInput = document.getElementById('inputCustomerName').value.trim();
+      currentCustomer = nameInput !== "" ? nameInput : "Guest";
+
+      if (!tableSessions[currentTable]) {
+        tableSessions[currentTable] = {
+          customerName: currentCustomer,
+          guestCount: guestCount,
+          nationality: selectedNationality,
+          orderItems: [],
+          active: true
+        };
+      } else {
+        tableSessions[currentTable].customerName = currentCustomer;
+        tableSessions[currentTable].guestCount = guestCount;
+        tableSessions[currentTable].nationality = selectedNationality;
+        tableSessions[currentTable].active = true;
+      }
+      localStorage.setItem('NC_POS_SESSIONS', JSON.stringify(tableSessions));
+
+      currentOrder = tableSessions[currentTable].orderItems || [];
+
+      document.getElementById('headerTable').innerText = currentTable;
+      document.getElementById('headerCustomer').innerText = `${currentCustomer} (${guestCount}P / ${selectedNationality})`;
+      document.getElementById('sessionModal').classList.add('hidden');
+      renderOrder();
+    }
+
+    function renderMenu(category = 'All') {
+      const grid = document.getElementById('menuGrid');
+      grid.innerHTML = '';
+      const filtered = category === 'All' ? MENU_ITEMS : MENU_ITEMS.filter(i => i.category === category);
+
+      filtered.forEach(item => {
+        const btn = document.createElement('div');
+        btn.className = "menu-card";
+        btn.onclick = () => addItemToOrder(item);
+        btn.innerHTML = `
+          <div class="menu-name">${item.name}</div>
+          <div class="menu-price">฿${item.price}</div>
+        `;
+        grid.appendChild(btn);
+      });
+    }
+
+    function filterCategory(cat, el) {
+      document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+      el.classList.add('active');
+      renderMenu(cat);
+    }
+
+    function addItemToOrder(item) {
+      const unconfirmed = currentOrder.find(i => i.id === item.id && !i.confirmed);
+      if (unconfirmed) {
+        unconfirmed.quantity += 1;
+      } else {
+        currentOrder.push({ ...item, quantity: 1, confirmed: false });
+      }
+      renderOrder();
+    }
+
+    function changeQuantity(index, delta) {
+      const item = currentOrder[index];
+      if (!item || item.confirmed) return;
+      item.quantity += delta;
+      if (item.quantity <= 0) {
+        currentOrder.splice(index, 1);
+      }
+      renderOrder();
+    }
+
+    function cancelConfirmedItem(index) {
+      const item = currentOrder[index];
+      if (!item) return;
+      if (confirm(`Cancel confirmed item: "${item.name} (${item.quantity}x)"?`)) {
+        currentOrder.splice(index, 1);
+        renderOrder();
+      }
+    }
+
+    function clearCurrentOrder() {
+      if (currentOrder.length === 0) return;
+      if (confirm("Clear current order?")) {
+        currentOrder = [];
+        renderOrder();
+      }
+    }
+
+    function renderOrder() {
+      const container = document.getElementById('orderItemsContainer');
+      const btnCheckout = document.getElementById('btnCheckout');
+      const btnSendOrder = document.getElementById('btnSendOrder');
+
+      if (tableSessions[currentTable]) {
+        tableSessions[currentTable].orderItems = currentOrder;
+        localStorage.setItem('NC_POS_SESSIONS', JSON.stringify(tableSessions));
+      }
+      
+      const totalCount = currentOrder.reduce((acc, i) => acc + i.quantity, 0);
+      document.getElementById('spCartCount').innerText = totalCount;
+
+      if (currentOrder.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #94a3b8; margin-top: 30px; font-weight: 600; font-size: 14px;">Select items from menu</p>';
+        document.getElementById('subtotalDisplay').innerText = '฿0';
+        document.getElementById('totalDisplay').innerText = '฿0';
+        document.getElementById('spCartTotal').innerText = '฿0';
+        btnCheckout.disabled = true;
+        if (btnSendOrder) btnSendOrder.disabled = true;
+        return;
+      }
+
+      container.innerHTML = '';
+      let total = 0;
+      let hasUnconfirmed = false;
+
+      currentOrder.forEach((item, index) => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+        if (!item.confirmed) hasUnconfirmed = true;
+
+        const row = document.createElement('div');
+        row.className = `cart-item-row ${item.confirmed ? 'is-confirmed' : ''}`;
+
+        const actionControl = item.confirmed
+          ? `<button type="button" onclick="cancelConfirmedItem(${index})" class="btn-item-cancel">Cancel</button>`
+          : `<div class="qty-controls">
+               <button type="button" onclick="changeQuantity(${index}, -1)" class="btn-qty">-</button>
+               <span class="qty-display">${item.quantity}</span>
+               <button type="button" onclick="changeQuantity(${index}, 1)" class="btn-qty">+</button>
+             </div>`;
+
+        row.innerHTML = `
+          <div>
+            <div class="item-info-name">
+              ${item.name} 
+              ${item.confirmed ? '<span style="font-size:10px; color:#10b981; font-weight:800; margin-left:4px;">[Ordered]</span>' : ''}
+            </div>
+            <div class="item-info-calc">฿${item.price} &times; ${item.quantity} = ฿${itemTotal}</div>
+          </div>
+          <div>${actionControl}</div>
+        `;
+        container.appendChild(row);
+      });
+
+      document.getElementById('subtotalDisplay').innerText = `฿${total}`;
+      document.getElementById('totalDisplay').innerText = `฿${total}`;
+      document.getElementById('spCartTotal').innerText = `฿${total}`;
+      
+      btnCheckout.disabled = false;
+      if (btnSendOrder) btnSendOrder.disabled = !hasUnconfirmed;
+    }
+
+    function confirmCurrentOrderOnly() {
+      const unconfirmedItems = currentOrder.filter(i => !i.confirmed);
+      if (unconfirmedItems.length === 0) {
+        alert("No newly added items to order.");
+        return;
+      }
+
+      document.getElementById('confirmModalTable').innerText = currentTable;
+      document.getElementById('confirmModalCustomer').innerText = currentCustomer;
+
+      const container = document.getElementById('confirmOrderItemsList');
+      container.innerHTML = '';
+      let orderBatchTotal = 0;
+
+      unconfirmedItems.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        orderBatchTotal += itemTotal;
+
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.justifyContent = 'space-between';
+        row.style.fontSize = '14px';
+        row.style.fontWeight = '700';
+        row.innerHTML = `
+          <span>${item.name} &times; ${item.quantity}</span>
+          <span style="color: #334155;">฿${itemTotal}</span>
+        `;
+        container.appendChild(row);
+      });
+
+      document.getElementById('confirmModalTotal').innerText = `฿${orderBatchTotal}`;
+      
+      document.getElementById('orderConfirmContent').classList.remove('hidden');
+      document.getElementById('orderSuccessContent').classList.add('hidden');
+      document.getElementById('orderConfirmModal').classList.remove('hidden');
+    }
+
+    function closeOrderConfirmModal() {
+      document.getElementById('orderConfirmModal').classList.add('hidden');
+    }
+
+    function executeFinalOrder() {
+      currentOrder.forEach(i => i.confirmed = true);
+
+      if (tableSessions[currentTable]) {
+        tableSessions[currentTable].orderItems = currentOrder;
+        tableSessions[currentTable].active = true;
+        localStorage.setItem('NC_POS_SESSIONS', JSON.stringify(tableSessions));
+      }
+
+      renderOrder();
+      toggleSpCart(false);
+
+      document.getElementById('orderConfirmContent').classList.add('hidden');
+      document.getElementById('orderSuccessContent').classList.remove('hidden');
+
+      setTimeout(() => {
+        closeOrderConfirmModal();
+        openSessionModal();
+      }, 3000);
+    }
+
+    function confirmDeleteTableInfoModal() {
+      const session = tableSessions[currentTable];
+      document.getElementById('delModalTable').innerText = currentTable;
+      document.getElementById('delModalCustomer').innerText = (session && session.customerName) ? session.customerName : 'GUEST';
+
+      const listContainer = document.getElementById('delModalItemsList');
+      listContainer.innerHTML = '';
+
+      if (!session || !session.orderItems || session.orderItems.length === 0) {
+        listContainer.innerHTML = '<div style="color: #64748b; font-size: 13px;">(No active orders)</div>';
+      } else {
+        session.orderItems.forEach(item => {
+          const row = document.createElement('div');
+          row.style.display = 'flex';
+          row.style.justifyContent = 'space-between';
+          row.style.fontSize = '13px';
+          row.style.fontWeight = '700';
+          row.innerHTML = `
+            <span>${item.name} &times; ${item.quantity}</span>
+            <span>฿${item.price * item.quantity}</span>
+          `;
+          listContainer.appendChild(row);
+        });
+      }
+
+      document.getElementById('deleteTableInfoContent').classList.remove('hidden');
+      document.getElementById('deleteSuccessContent').classList.add('hidden');
+      document.getElementById('deleteTableInfoModal').classList.remove('hidden');
+    }
+
+    function closeDeleteTableInfoModal() {
+      document.getElementById('deleteTableInfoModal').classList.add('hidden');
+    }
+
+    function executeDeleteTableInfo() {
+      delete tableSessions[currentTable];
+      localStorage.setItem('NC_POS_SESSIONS', JSON.stringify(tableSessions));
+      
+      currentOrder = [];
+      currentCustomer = "";
+
+      document.getElementById('deleteTableInfoContent').classList.add('hidden');
+      document.getElementById('deleteSuccessContent').classList.remove('hidden');
+
+      setTimeout(() => {
+        closeDeleteTableInfoModal();
+        openSessionModal();
+      }, 3000);
+    }
+
+    function populateDropdowns() {
+      const cashierSel = document.getElementById('selectCashier');
+      cashierSel.innerHTML = '<option value="" disabled selected>-- Select Cashier --</option>';
+      staffList.filter(s => s.id !== 'store').forEach(st => {
+        const opt = document.createElement('option');
+        opt.value = st.name;
+        opt.innerText = st.name;
+        cashierSel.appendChild(opt);
+      });
+
+      const tipSel = document.getElementById('selectTipReceiver');
+      tipSel.innerHTML = `
+        <option value="" disabled selected>-- Select Receiver --</option>
+        <option value="No Tip">No Tip</option>
+      `;
+      staffList.forEach(st => {
+        const opt = document.createElement('option');
+        opt.value = st.name;
+        opt.innerText = st.name;
+        tipSel.appendChild(opt);
+      });
+    }
+
+    function onCashierChanged() {
+      selectedCashier = document.getElementById('selectCashier').value;
+      const btnCash = document.getElementById('btnMethodCash');
+      const btnPP = document.getElementById('btnMethodPP');
+
+      if (selectedCashier && selectedCashier.trim() !== '') {
+        btnCash.disabled = false;
+        btnPP.disabled = false;
+      } else {
+        btnCash.disabled = true;
+        btnPP.disabled = true;
+      }
+    }
+
+    function openPaymentModal() {
+      toggleSpCart(false);
+
+      if (currentTable === "Training") {
+        if (confirm("Finalize training order? Drinks will be recorded for stock inventory.")) {
+          submitTrainingTransaction();
+        }
+        return;
+      }
+
+      const total = currentOrder.reduce((acc, i) => acc + (i.price * i.quantity), 0);
+      document.getElementById('modalTotalDisplay').innerText = `฿${total}`;
+      
+      populateDropdowns();
+      resetPaymentState();
+      
+      document.getElementById('paymentStepSelect').classList.remove('hidden');
+      document.getElementById('paymentStepTip').classList.add('hidden');
+      document.getElementById('paymentSuccessContent').classList.add('hidden');
+      document.getElementById('paymentModal').classList.remove('hidden');
+    }
+
+    function closePaymentModal() {
+      document.getElementById('paymentModal').classList.add('hidden');
+      resetPaymentState();
+    }
+
+    function resetPaymentState() {
+      selectedPayment = null;
+      slipImageBase64 = null;
+      isSlipConfirmed = false;
+      receivedCashAmount = 0;
+      changeDueAmount = 0;
+      selectedCashier = "";
+
+      document.getElementById('selectCashier').value = "";
+      document.getElementById('cashArea').classList.add('hidden');
+      document.getElementById('promptPayArea').classList.add('hidden');
+      document.getElementById('slipPreviewBlock').classList.add('hidden');
+      document.getElementById('cameraActionBlock').classList.remove('hidden');
+      
+      const btnCash = document.getElementById('btnMethodCash');
+      const btnPP = document.getElementById('btnMethodPP');
+      btnCash.classList.remove('selected');
+      btnPP.classList.remove('selected');
+      btnCash.disabled = true;
+      btnPP.disabled = true;
+      
+      document.getElementById('inputReceivedCash').value = '';
+      
+      const btnProceedCash = document.getElementById('btnProceedCashTip');
+      btnProceedCash.disabled = true;
+      btnProceedCash.style.background = "#cbd5e1";
+      btnProceedCash.style.color = "#64748b";
+      
+      const btnProceedScan = document.getElementById('btnProceedScanTip');
+      btnProceedScan.disabled = true;
+      btnProceedScan.style.background = "#cbd5e1";
+      btnProceedScan.style.color = "#64748b";
+
+      const btnConfirm = document.getElementById('btnConfirmSlip');
+      btnConfirm.innerText = "Confirm OK";
+      btnConfirm.style.background = "#16a34a";
+
+      document.getElementById('inputTipAmount').value = '';
+      document.getElementById('inputScanPaidAmount').value = '';
+      document.getElementById('scanCalculatedTipDisplay').innerText = '฿0';
+    }
+
+    function selectMethod(method) {
+      if (!selectedCashier) {
+        alert("Please select Cashier first.");
+        return;
+      }
+
+      selectedPayment = method;
+      const btnCash = document.getElementById('btnMethodCash');
+      const btnPP = document.getElementById('btnMethodPP');
+      const cashArea = document.getElementById('cashArea');
+      const ppArea = document.getElementById('promptPayArea');
+
+      if (method === 'Cash') {
+        btnCash.classList.add('selected');
+        btnPP.classList.remove('selected');
+        cashArea.classList.remove('hidden');
+        ppArea.classList.add('hidden');
+      } else {
+        btnPP.classList.add('selected');
+        btnCash.classList.remove('selected');
+        ppArea.classList.remove('hidden');
+        cashArea.classList.add('hidden');
+      }
+    }
+
+    function checkCashReceivedInput() {
+      const total = currentOrder.reduce((acc, i) => acc + (i.price * i.quantity), 0);
+      const val = parseFloat(document.getElementById('inputReceivedCash').value) || 0;
+      receivedCashAmount = val;
+
+      const btn = document.getElementById('btnProceedCashTip');
+
+      if (val >= total && total > 0) {
+        changeDueAmount = val - total;
+        btn.disabled = false;
+        btn.style.background = "#ea580c";
+        btn.style.color = "#ffffff";
+      } else {
+        changeDueAmount = 0;
+        btn.disabled = true;
+        btn.style.background = "#cbd5e1";
+        btn.style.color = "#64748b";
+      }
+    }
+
+    function handleSlipCapture(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        slipImageBase64 = event.target.result;
+        document.getElementById('slipPreviewImg').src = slipImageBase64;
+        document.getElementById('cameraActionBlock').classList.add('hidden');
+        document.getElementById('slipPreviewBlock').classList.remove('hidden');
+        isSlipConfirmed = false;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function confirmSlipPhoto() {
+      if (!slipImageBase64) return;
+      isSlipConfirmed = true;
+      const btn = document.getElementById('btnConfirmSlip');
+      btn.innerText = "✓ Confirmed";
+      btn.style.background = "#64748b";
+
+      proceedToTipScreen();
+    }
+
+    function proceedToTipScreen() {
+      if (selectedPayment === 'Scan' && !slipImageBase64) {
+        alert("Please take a photo of the slip first.");
+        return;
+      }
+
+      document.getElementById('paymentStepSelect').classList.add('hidden');
+      document.getElementById('paymentStepTip').classList.remove('hidden');
+
+      document.getElementById('displayActiveCashier').innerText = selectedCashier;
+
+      const total = currentOrder.reduce((acc, i) => acc + (i.price * i.quantity), 0);
+      const changeBox = document.getElementById('tipScreenChangeBox');
+      const scanBlock = document.getElementById('scanTipCalculationBlock');
+      const cashDirectBlock = document.getElementById('cashTipDirectBlock');
+
+      if (selectedPayment === 'Cash') {
+        document.getElementById('tipScreenChangeAmount').innerText = `฿${changeDueAmount}`;
+        changeBox.classList.remove('hidden');
+        scanBlock.classList.add('hidden');
+        cashDirectBlock.classList.remove('hidden');
+        document.getElementById('inputTipAmount').value = '';
+      } else {
+        changeBox.classList.add('hidden');
+        scanBlock.classList.remove('hidden');
+        cashDirectBlock.classList.add('hidden');
+        document.getElementById('scanOrderTotalDisplay').innerText = `฿${total}`;
+        document.getElementById('inputScanPaidAmount').value = '';
+        document.getElementById('scanCalculatedTipDisplay').innerText = `฿0`;
+        document.getElementById('inputTipAmount').value = '';
+      }
+
+      document.getElementById('selectTipReceiver').value = "";
+      validateFinalPaymentButton();
+    }
+
+    function calculateScanTip() {
+      const total = currentOrder.reduce((acc, i) => acc + (i.price * i.quantity), 0);
+      const paidInput = document.getElementById('inputScanPaidAmount').value;
+      const paid = parseFloat(paidInput) || 0;
+      
+      let tip = 0;
+      if (paid >= total && total > 0) {
+        tip = paid - total;
+      }
+
+      document.getElementById('scanCalculatedTipDisplay').innerText = `฿${tip}`;
+      document.getElementById('inputTipAmount').value = tip;
+
+      const receiverSel = document.getElementById('selectTipReceiver');
+      if (tip === 0 && paidInput !== '') {
+        receiverSel.value = "No Tip";
+      } else if (tip > 0 && receiverSel.value === "No Tip") {
+        receiverSel.value = "";
+      }
+
+      validateFinalPaymentButton();
+    }
+
+    function onTipReceiverChanged() {
+      const receiver = document.getElementById('selectTipReceiver').value;
+      const total = currentOrder.reduce((acc, i) => acc + (i.price * i.quantity), 0);
+
+      if (receiver === 'No Tip') {
+        document.getElementById('inputTipAmount').value = 0;
+        if (selectedPayment === 'Scan') {
+          document.getElementById('inputScanPaidAmount').value = total;
+          document.getElementById('scanCalculatedTipDisplay').innerText = `฿0`;
+        }
+      }
+      validateFinalPaymentButton();
+    }
+
+    function backToPaymentSelect() {
+      document.getElementById('paymentStepTip').classList.add('hidden');
+      document.getElementById('paymentStepSelect').classList.remove('hidden');
+    }
+
+    function validateFinalPaymentButton() {
+      const sel = document.getElementById('selectTipReceiver').value;
+      const btn = document.getElementById('btnCompleteTransaction');
+      
+      let isValid = false;
+      if (sel && sel.trim() !== '') {
+        if (selectedPayment === 'Scan') {
+          const paid = parseFloat(document.getElementById('inputScanPaidAmount').value);
+          const total = currentOrder.reduce((acc, i) => acc + (i.price * i.quantity), 0);
+          if (!isNaN(paid) && paid >= total) {
+            isValid = true;
+          }
+        } else {
+          isValid = true;
+        }
+      }
+
+      if (isValid) {
+        btn.disabled = false;
+        btn.style.background = "#16a34a";
+        btn.style.color = "#ffffff";
+      } else {
+        btn.disabled = true;
+        btn.style.background = "#cbd5e1";
+        btn.style.color = "#64748b";
+      }
+    }
+
+    function submitTrainingTransaction() {
+      const orderId = `TR-${Date.now().toString().slice(-6)}`;
+      const payload = {
+        orderId: orderId,
+        tableNo: "Training",
+        customerName: "Staff Training",
+        guestCount: 1,
+        nationality: "Thai",
+        subtotal: 0,
+        discount: 0,
+        total: 0,
+        paymentMethod: "Training",
+        receivedCash: 0,
+        changeDue: 0,
+        tipAmount: 0,
+        tipReceiver: "No Tip",
+        slipImageBase64: null,
+        staffName: "Manager",
+        items: currentOrder.map(i => ({
+          name: i.name,
+          category: i.category,
+          price: 0,
+          quantity: i.quantity
+        }))
+      };
+
+      fetch(GAS_ENDPOINT, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }).catch(err => console.error("Training sync error:", err));
+
+      delete tableSessions["Training"];
+      localStorage.setItem('NC_POS_SESSIONS', JSON.stringify(tableSessions));
+      currentOrder = [];
+      currentCustomer = "";
+
+      alert("Training order submitted! Stock data synced.");
+      renderOrder();
+      openSessionModal();
+    }
+
+    async function submitTransaction() {
+      const tipReceiver = document.getElementById('selectTipReceiver').value;
+      if (!tipReceiver) {
+        alert("Please select who received the tip.");
+        return;
+      }
+
+      const tipAmount = parseFloat(document.getElementById('inputTipAmount').value) || 0;
+      const btn = document.getElementById('btnCompleteTransaction');
+      btn.disabled = true;
+      btn.innerText = "Processing...";
+
+      const total = currentOrder.reduce((acc, i) => acc + (i.price * i.quantity), 0);
+      const orderId = `NC-${Date.now().toString().slice(-6)}`;
+      const sessionData = tableSessions[currentTable] || {};
+
+      const payload = {
+        orderId: orderId,
+        tableNo: currentTable,
+        customerName: currentCustomer,
+        guestCount: sessionData.guestCount || 1,
+        nationality: sessionData.nationality || "Thai",
+        subtotal: total,
+        discount: 0,
+        total: total,
+        paymentMethod: selectedPayment,
+        receivedCash: selectedPayment === 'Cash' ? receivedCashAmount : (parseFloat(document.getElementById('inputScanPaidAmount').value) || total),
+        changeDue: selectedPayment === 'Cash' ? changeDueAmount : 0,
+        tipAmount: tipAmount,
+        tipReceiver: tipReceiver,
+        slipImageBase64: selectedPayment === 'Scan' ? slipImageBase64 : null,
+        staffName: selectedCashier || "Staff",
+        items: currentOrder.map(i => ({
+          name: i.name,
+          category: i.category,
+          price: i.price,
+          quantity: i.quantity
+        }))
+      };
+
+      fetch(GAS_ENDPOINT, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }).catch(err => {
+        console.error("Background sync error:", err);
+      });
+
+      setTimeout(() => {
+        delete tableSessions[currentTable];
+        localStorage.setItem('NC_POS_SESSIONS', JSON.stringify(tableSessions));
+        currentOrder = [];
+        currentCustomer = "";
+
+        document.getElementById('paymentStepTip').classList.add('hidden');
+        document.getElementById('paymentSuccessContent').classList.remove('hidden');
+
+        setTimeout(() => {
+          closePaymentModal();
+          renderOrder();
+          openSessionModal();
+        }, 3000);
+      }, 1000);
+    }
+
+    openSessionModal();
+    renderMenu();
+  </script>
+</body>
+</html>

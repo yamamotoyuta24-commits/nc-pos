@@ -27,7 +27,6 @@
       position: relative;
     }
     
-    /* ボタン類のタッチ判定を強制有効化 */
     button, input, select, .floor-item, .cat-btn, .menu-card, .active-session-badge {
       touch-action: manipulation;
       pointer-events: auto !important;
@@ -346,39 +345,41 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: 12px;
       z-index: 999;
     }
     .modal-card {
       background: #ffffff;
       border-radius: 20px;
       width: 100%;
-      max-width: 650px;
-      padding: 22px;
+      max-width: 600px;
+      padding: 18px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-      max-height: 90vh;
+      max-height: 94vh;
       overflow-y: auto;
+      overflow-x: hidden;
     }
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid #e2e8f0;
-      padding-bottom: 10px;
+      padding-bottom: 8px;
       position: relative;
       z-index: 20;
     }
 
+    /* フロアマップ領域：はみ出しを完全禁止 */
     .floor-canvas-container {
       position: relative;
       width: 100%;
-      height: 320px;
+      height: 290px;
       background: #f8fafc;
       border: 2px dashed #cbd5e1;
-      border-radius: 16px;
+      border-radius: 14px;
       overflow: hidden;
       touch-action: none;
       z-index: 10;
@@ -387,6 +388,8 @@
       border: 2px solid #ea580c;
       background: #fffbeb;
     }
+
+    /* フロアアイテム基本 */
     .floor-item {
       position: absolute;
       display: flex;
@@ -396,40 +399,31 @@
       border-radius: 12px;
       font-weight: 800;
       box-shadow: 0 2px 4px rgba(0,0,0,0.06);
-      transition: transform 0.1s, box-shadow 0.1s;
+      transition: width 0.15s, height 0.15s, font-size 0.15s;
     }
     .floor-item.bar-seat {
-      width: 64px;
-      height: 64px;
       background: #ffffff;
       border: 2px solid #94a3b8;
       color: #334155;
-      font-size: 13px;
       border-radius: 50%;
     }
     .floor-item.table-seat {
-      width: 84px;
-      height: 70px;
       background: #ffffff;
       border: 2px solid #3b82f6;
       color: #1e3a8a;
-      font-size: 14px;
-      border-radius: 12px;
+      border-radius: 10px;
     }
     .floor-item.training-seat {
-      width: 52px;
-      height: 52px;
       background: #f1f5f9;
       border: 2px dashed #64748b;
       color: #475569;
-      font-size: 10px;
-      border-radius: 10px;
+      border-radius: 8px;
     }
     .floor-item.selected {
       border-color: #ea580c !important;
       background: #ea580c !important;
       color: #ffffff !important;
-      transform: scale(1.06);
+      transform: scale(1.05);
       box-shadow: 0 6px 12px rgba(234, 88, 12, 0.3);
       z-index: 15;
     }
@@ -444,24 +438,22 @@
       color: #991b1b !important;
     }
     
-    /* ツールバーのタップ領域を最優先化 */
+    /* ツールバー */
     .edit-toolbar {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       position: relative;
       z-index: 30;
     }
     .btn-edit-mode {
       background: #f1f5f9;
       border: 1.5px solid #cbd5e1;
-      padding: 8px 14px;
-      border-radius: 10px;
-      font-size: 13px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
       font-weight: 800;
       color: #334155;
-      pointer-events: auto !important;
-      touch-action: manipulation;
     }
     .btn-edit-mode.active {
       background: #ea580c !important;
@@ -472,21 +464,42 @@
     .btn-delete-table-info {
       background: #fff1f2;
       border: 1.5px solid #fecdd3;
-      padding: 8px 12px;
-      border-radius: 10px;
-      font-size: 13px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 12px;
       font-weight: 800;
       color: #e11d48;
-      pointer-events: auto !important;
-      touch-action: manipulation;
+    }
+
+    /* 5段階サイズセレクタのボタンスタイル */
+    .size-btn-group {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      background: #e2e8f0;
+      padding: 4px;
+      border-radius: 8px;
+    }
+    .btn-size-choice {
+      border: none;
+      background: transparent;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 800;
+      border-radius: 6px;
+      color: #475569;
+    }
+    .btn-size-choice.active {
+      background: #ea580c;
+      color: #ffffff;
     }
 
     .input-customer {
       width: 100%;
       border: 2px solid #cbd5e1;
       border-radius: 12px;
-      padding: 12px 16px;
-      font-size: 15px;
+      padding: 10px 14px;
+      font-size: 14px;
       font-weight: 600;
       color: #1e293b;
       outline: none;
@@ -502,19 +515,19 @@
       background: #ea580c;
       color: #ffffff;
       border: none;
-      padding: 15px;
+      padding: 14px;
       border-radius: 12px;
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 800;
     }
 
     .nat-btn {
       flex: 1;
-      padding: 10px 4px;
+      padding: 8px 4px;
       background: #f8fafc;
       border: 2px solid #cbd5e1;
-      border-radius: 10px;
-      font-size: 13px;
+      border-radius: 8px;
+      font-size: 12px;
       font-weight: 800;
       color: #475569;
       text-align: center;
@@ -588,11 +601,11 @@
       }
       .menu-container {
         padding-bottom: 80px;
-        grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
         gap: 8px;
       }
       .menu-card {
-        height: 95px;
+        height: 90px;
         padding: 10px;
       }
       .menu-name {
@@ -621,11 +634,11 @@
         display: flex;
       }
       .modal-card {
-        padding: 16px;
-        max-height: 94vh;
+        padding: 14px;
+        max-height: 95vh;
       }
       .floor-canvas-container {
-        height: 250px;
+        height: 240px;
       }
     }
   </style>
@@ -637,7 +650,7 @@
     <div class="modal-card">
       <div class="modal-header">
         <div>
-          <h3 style="font-size: 17px; font-weight: 900; color: #0f172a;">Floor Map & Table</h3>
+          <h3 style="font-size: 16px; font-weight: 900; color: #0f172a;">Floor Map & Table</h3>
           <p style="font-size: 11px; color: #64748b; font-weight: 600;">Tap seat to select</p>
         </div>
         <div class="edit-toolbar">
@@ -653,11 +666,24 @@
       <!-- フロアマップ領域 -->
       <div id="floorCanvas" class="floor-canvas-container"></div>
 
-      <!-- 編集モードツールボタン -->
-      <div id="editToolsBlock" class="hidden" style="display: flex; gap: 8px; position: relative; z-index: 25;">
-        <button type="button" onclick="addNewSeat('Bar')" style="flex: 1; background: #f8fafc; border: 1.5px solid #cbd5e1; padding: 10px; border-radius: 10px; font-weight: 800; font-size: 13px;">+ Add Bar</button>
-        <button type="button" onclick="addNewSeat('Table')" style="flex: 1; background: #f8fafc; border: 1.5px solid #cbd5e1; padding: 10px; border-radius: 10px; font-weight: 800; font-size: 13px;">+ Add Table</button>
-        <button type="button" onclick="resetDefaultLayout()" style="background: #fee2e2; border: 1px solid #f87171; color: #b91c1c; padding: 10px 14px; border-radius: 10px; font-weight: 800; font-size: 13px;">Reset</button>
+      <!-- 編集モードツールボタン（5段階サイズ切り替えボタン付き） -->
+      <div id="editToolsBlock" class="hidden" style="display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border: 1.5px solid #cbd5e1; padding: 6px 10px; border-radius: 10px;">
+          <span style="font-size: 12px; font-weight: 800; color: #475569;">Icon Size:</span>
+          <div class="size-btn-group">
+            <button type="button" onclick="changeSeatScale(1)" id="btnSize-1" class="btn-size-choice">XS</button>
+            <button type="button" onclick="changeSeatScale(2)" id="btnSize-2" class="btn-size-choice">S</button>
+            <button type="button" onclick="changeSeatScale(3)" id="btnSize-3" class="btn-size-choice">M</button>
+            <button type="button" onclick="changeSeatScale(4)" id="btnSize-4" class="btn-size-choice">L</button>
+            <button type="button" onclick="changeSeatScale(5)" id="btnSize-5" class="btn-size-choice">XL</button>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 6px;">
+          <button type="button" onclick="addNewSeat('Bar')" style="flex: 1; background: #f8fafc; border: 1.5px solid #cbd5e1; padding: 8px; border-radius: 8px; font-weight: 800; font-size: 12px;">+ Add Bar</button>
+          <button type="button" onclick="addNewSeat('Table')" style="flex: 1; background: #f8fafc; border: 1.5px solid #cbd5e1; padding: 8px; border-radius: 8px; font-weight: 800; font-size: 12px;">+ Add Table</button>
+          <button type="button" onclick="resetDefaultLayout()" style="background: #fee2e2; border: 1px solid #f87171; color: #b91c1c; padding: 8px 10px; border-radius: 8px; font-weight: 800; font-size: 12px;">Reset</button>
+        </div>
       </div>
 
       <!-- 客名入力 -->
@@ -666,15 +692,15 @@
         <input type="text" id="inputCustomerName" class="input-customer" placeholder="Enter guest name or note..." autocomplete="off">
       </div>
 
-      <!-- 人数 & 国籍選択（必須項目） -->
-      <div style="display: flex; gap: 10px;">
+      <!-- 人数 & 国籍選択 -->
+      <div style="display: flex; gap: 8px;">
         <div style="flex: 1;">
           <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 4px;">
             Guests <span style="color: #ef4444;">*</span>
           </label>
           <div style="display: flex; align-items: center; gap: 4px;">
             <button type="button" onclick="changeGuestCount(-1)" class="btn-qty" style="width: 32px; height: 32px; font-size: 16px;">-</button>
-            <input type="number" id="inputGuestCount" min="1" max="20" value="1" readonly style="width: 100%; text-align: center; font-size: 16px; font-weight: 800; border: 2px solid #cbd5e1; border-radius: 8px; height: 32px; background: #fff;">
+            <input type="number" id="inputGuestCount" min="1" max="20" value="1" readonly style="width: 100%; text-align: center; font-size: 15px; font-weight: 800; border: 2px solid #cbd5e1; border-radius: 8px; height: 32px; background: #fff;">
             <button type="button" onclick="changeGuestCount(1)" class="btn-qty" style="width: 32px; height: 32px; font-size: 16px;">+</button>
           </div>
         </div>
@@ -1010,16 +1036,26 @@
     const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwTQxVoIEsO-y3GUxrD_1MUbCszDfiC1RpMGhsQVAmwZqdxBRTwQqBrLdMVW-TP4kgBrQ/exec";
     const MANAGER_PIN = "1536";
 
+    // 5段階サイズ定義 (XS: 1, S: 2, M: 3, L: 4, XL: 5)
+    const SCALE_PRESETS = {
+      1: { barW: 44, barH: 44, tblW: 56, tblH: 46, trnW: 38, trnH: 38, font: 10 },
+      2: { barW: 52, barH: 52, tblW: 68, tblH: 56, trnW: 44, trnH: 44, font: 11 },
+      3: { barW: 60, barH: 60, tblW: 78, tblH: 64, trnW: 50, trnH: 50, font: 12 },
+      4: { barW: 70, barH: 70, tblW: 90, tblH: 74, trnW: 58, trnH: 58, font: 13 },
+      5: { barW: 80, barH: 80, tblW: 104, tblH: 86, trnW: 66, trnH: 66, font: 15 }
+    };
+    let currentScaleLevel = parseInt(localStorage.getItem('NC_POS_SEAT_SCALE')) || 3;
+
     const DEFAULT_LAYOUT = [
-      { id: "Bar-1", label: "Bar-1", type: "bar-seat", x: 30, y: 30 },
-      { id: "Bar-2", label: "Bar-2", type: "bar-seat", x: 110, y: 30 },
-      { id: "Bar-3", label: "Bar-3", type: "bar-seat", x: 190, y: 30 },
-      { id: "Bar-4", label: "Bar-4", type: "bar-seat", x: 270, y: 30 },
-      { id: "T-1", label: "Table-1", type: "table-seat", x: 400, y: 30 },
-      { id: "T-2", label: "Table-2", type: "table-seat", x: 400, y: 130 },
-      { id: "T-3", label: "Table-3", type: "table-seat", x: 400, y: 230 },
-      { id: "T-4", label: "Table-4", type: "table-seat", x: 150, y: 180 },
-      { id: "Training", label: "🔒 Training", type: "training-seat", x: 20, y: 240 }
+      { id: "Bar-1", label: "Bar-1", type: "bar-seat", x: 20, y: 20 },
+      { id: "Bar-2", label: "Bar-2", type: "bar-seat", x: 85, y: 20 },
+      { id: "Bar-3", label: "Bar-3", type: "bar-seat", x: 150, y: 20 },
+      { id: "Bar-4", label: "Bar-4", type: "bar-seat", x: 215, y: 20 },
+      { id: "T-1", label: "Table-1", type: "table-seat", x: 240, y: 90 },
+      { id: "T-2", label: "Table-2", type: "table-seat", x: 240, y: 165 },
+      { id: "T-3", label: "Table-3", type: "table-seat", x: 130, y: 140 },
+      { id: "T-4", label: "Table-4", type: "table-seat", x: 20, y: 140 },
+      { id: "Training", label: "🔒 Train", type: "training-seat", x: 20, y: 220 }
     ];
 
     const DEFAULT_STAFF_LIST = [
@@ -1034,7 +1070,7 @@
     let currentLayout = JSON.parse(localStorage.getItem('NC_POS_LAYOUT')) || DEFAULT_LAYOUT;
     
     if (!currentLayout.some(s => s.id === "Training")) {
-      currentLayout.push({ id: "Training", label: "🔒 Training", type: "training-seat", x: 20, y: 240 });
+      currentLayout.push({ id: "Training", label: "🔒 Train", type: "training-seat", x: 20, y: 220 });
     }
 
     let isEditingLayout = false;
@@ -1077,9 +1113,27 @@
       }
     }
 
+    function changeSeatScale(level) {
+      currentScaleLevel = level;
+      localStorage.setItem('NC_POS_SEAT_SCALE', currentScaleLevel);
+      updateSizeButtons();
+      renderFloorMap();
+    }
+
+    function updateSizeButtons() {
+      for (let i = 1; i <= 5; i++) {
+        const btn = document.getElementById(`btnSize-${i}`);
+        if (btn) {
+          if (i === currentScaleLevel) btn.classList.add('active');
+          else btn.classList.remove('active');
+        }
+      }
+    }
+
     function renderFloorMap() {
       const canvas = document.getElementById('floorCanvas');
       canvas.innerHTML = '';
+      const preset = SCALE_PRESETS[currentScaleLevel] || SCALE_PRESETS[3];
 
       currentLayout.forEach(seat => {
         const div = document.createElement('div');
@@ -1089,6 +1143,22 @@
 
         div.className = `floor-item ${seat.type} ${isOccupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}`;
         div.id = `seat-${seat.id}`;
+
+        // 5段階プリセットに合わせたサイズとフォント適用
+        let w = preset.barW, h = preset.barH;
+        if (seat.type === 'table-seat') { w = preset.tblW; h = preset.tblH; }
+        if (seat.type === 'training-seat') { w = preset.trnW; h = preset.trnH; }
+
+        div.style.width = `${w}px`;
+        div.style.height = `${h}px`;
+        div.style.fontSize = `${preset.font}px`;
+
+        // キャンバスはみ出し防止
+        const maxX = Math.max(10, canvas.clientWidth - w - 4);
+        const maxY = Math.max(10, canvas.clientHeight - h - 4);
+        seat.x = Math.min(seat.x, maxX);
+        seat.y = Math.min(seat.y, maxY);
+
         div.style.left = `${seat.x}px`;
         div.style.top = `${seat.y}px`;
         
@@ -1096,7 +1166,7 @@
         if (isOccupied) {
           displayName = (session && session.customerName && session.customerName.trim() !== '') ? session.customerName : 'GUEST';
         }
-        div.innerHTML = `<span>${seat.label}</span>${displayName ? `<span style="font-size:10px; font-weight:700; opacity:0.9; margin-top:2px;">${displayName}</span>` : ''}`;
+        div.innerHTML = `<span>${seat.label}</span>${displayName ? `<span style="font-size:9px; font-weight:700; opacity:0.9; margin-top:2px;">${displayName}</span>` : ''}`;
 
         div.onclick = (e) => {
           if (isEditingLayout) {
@@ -1120,6 +1190,7 @@
         attachDragListener(div, seat);
         canvas.appendChild(div);
       });
+      updateSizeButtons();
     }
 
     function selectSeat(seatId) {
@@ -1202,8 +1273,8 @@
         const maxX = canvas.clientWidth - el.offsetWidth;
         const maxY = canvas.clientHeight - el.offsetHeight;
 
-        seat.x = Math.max(5, Math.min(maxX - 5, origX + dx));
-        seat.y = Math.max(5, Math.min(maxY - 5, origY + dy));
+        seat.x = Math.max(2, Math.min(maxX - 2, origX + dx));
+        seat.y = Math.max(2, Math.min(maxY - 2, origY + dy));
 
         el.style.left = `${seat.x}px`;
         el.style.top = `${seat.y}px`;
@@ -1225,7 +1296,6 @@
       window.addEventListener('mouseup', onEnd);
     }
 
-    /* 確実に発火するレイアウト編集トグル */
     function toggleEditMode() {
       isEditingLayout = !isEditingLayout;
       const btn = document.getElementById('btnToggleEdit');
@@ -1257,8 +1327,8 @@
         id: newId,
         label: newId,
         type: type === 'Bar' ? 'bar-seat' : 'table-seat',
-        x: 40 + (count * 15),
-        y: 80
+        x: 30 + (count * 10),
+        y: 60
       });
       saveLayoutToStorage();
       renderFloorMap();
@@ -1291,11 +1361,9 @@
       if (selectedNationality && guestCount >= 1) {
         btn.disabled = false;
         btn.style.opacity = "1";
-        btn.style.cursor = "pointer";
       } else {
         btn.disabled = true;
         btn.style.opacity = "0.4";
-        btn.style.cursor = "not-allowed";
       }
     }
 

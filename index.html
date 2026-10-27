@@ -341,7 +341,7 @@
       z-index: 40;
     }
 
-    /* モーダル枠を中央に完全固定 */
+    /* モーダル枠 */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -380,11 +380,11 @@
       z-index: 20;
     }
 
-    /* フロアマップ領域：はみ出し完全防止 */
+    /* フロアマップ領域 */
     .floor-canvas-container {
       position: relative;
       width: 100%;
-      height: 280px;
+      height: 270px;
       background: #f8fafc;
       border: 2px dashed #cbd5e1;
       border-radius: 14px;
@@ -419,12 +419,6 @@
       border: 2px solid #3b82f6;
       color: #1e3a8a;
       border-radius: 10px;
-    }
-    .floor-item.training-seat {
-      background: #f1f5f9;
-      border: 2px dashed #64748b;
-      color: #475569;
-      border-radius: 8px;
     }
     .floor-item.selected {
       border-color: #ea580c !important;
@@ -478,7 +472,24 @@
       color: #e11d48;
     }
 
-    /* 5段階サイズセレクタのボタンスタイル */
+    .btn-training-lock {
+      background: #f1f5f9;
+      border: 1.5px solid #cbd5e1;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: #475569;
+    }
+    .btn-training-lock:active {
+      background: #e2e8f0;
+      transform: scale(0.95);
+    }
+
+    /* 5段階サイズセレクタ */
     .size-btn-group {
       display: flex;
       gap: 3px;
@@ -645,7 +656,7 @@
         max-height: 95vh;
       }
       .floor-canvas-container {
-        height: 240px;
+        height: 230px;
       }
     }
   </style>
@@ -666,6 +677,9 @@
           </button>
           <button type="button" id="btnToggleEdit" onclick="toggleEditMode()" class="btn-edit-mode">
             ⚙ Edit
+          </button>
+          <button type="button" onclick="openPinModal()" class="btn-training-lock" title="Staff Training">
+            🔒
           </button>
         </div>
       </div>
@@ -691,6 +705,15 @@
           <button type="button" onclick="addNewSeat('Table')" style="flex: 1; background: #f8fafc; border: 1.5px solid #cbd5e1; padding: 8px; border-radius: 8px; font-weight: 800; font-size: 12px;">+ Add Table</button>
           <button type="button" onclick="resetDefaultLayout()" style="background: #fee2e2; border: 1px solid #f87171; color: #b91c1c; padding: 8px 10px; border-radius: 8px; font-weight: 800; font-size: 12px;">Reset</button>
         </div>
+      </div>
+
+      <!-- 受付スタッフ（Server）選択プルダウン（復活） -->
+      <div>
+        <label style="display: block; font-size: 12px; font-weight: 800; color: #1e293b; margin-bottom: 4px;">
+          Server / Staff <span style="color: #ef4444;">*</span>
+        </label>
+        <select id="selectOrderStaff" onchange="checkStartOrderValidation()" style="width: 100%; border: 2px solid #cbd5e1; border-radius: 10px; padding: 10px 12px; font-size: 14px; font-weight: 800; color: #1e293b; background: #fff; outline: none;">
+        </select>
       </div>
 
       <!-- 客名入力 -->
@@ -1040,15 +1063,14 @@
     const MANAGER_PIN = "1536";
 
     const SCALE_PRESETS = {
-      1: { barW: 42, barH: 42, tblW: 54, tblH: 44, trnW: 36, trnH: 36, font: 10 },
-      2: { barW: 50, barH: 50, tblW: 66, tblH: 54, trnW: 42, trnH: 42, font: 11 },
-      3: { barW: 58, barH: 58, tblW: 76, tblH: 62, trnW: 48, trnH: 48, font: 12 },
-      4: { barW: 66, barH: 66, tblW: 86, tblH: 70, trnW: 54, trnH: 54, font: 13 },
-      5: { barW: 76, barH: 76, tblW: 98, tblH: 80, trnW: 62, trnH: 62, font: 14 }
+      1: { barW: 42, barH: 42, tblW: 54, tblH: 44, font: 10 },
+      2: { barW: 50, barH: 50, tblW: 66, tblH: 54, font: 11 },
+      3: { barW: 58, barH: 58, tblW: 76, tblH: 62, font: 12 },
+      4: { barW: 66, barH: 66, tblW: 86, tblH: 70, font: 13 },
+      5: { barW: 76, barH: 76, tblW: 98, tblH: 80, font: 14 }
     };
     let currentScaleLevel = parseInt(localStorage.getItem('NC_POS_SEAT_SCALE')) || 3;
 
-    // スマホ縦画面でも綺麗に納まる初期レイアウト
     const DEFAULT_LAYOUT = [
       { id: "Bar-1", label: "C1", type: "bar-seat", x: 15, y: 15 },
       { id: "Bar-2", label: "C2", type: "bar-seat", x: 75, y: 15 },
@@ -1057,8 +1079,7 @@
       { id: "T-1", label: "Table-1", type: "table-seat", x: 195, y: 85 },
       { id: "T-2", label: "Table-2", type: "table-seat", x: 195, y: 155 },
       { id: "T-3", label: "Table-3", type: "table-seat", x: 105, y: 115 },
-      { id: "T-4", label: "Table-4", type: "table-seat", x: 15, y: 115 },
-      { id: "Training", label: "🔒 Train", type: "training-seat", x: 15, y: 185 }
+      { id: "T-4", label: "Table-4", type: "table-seat", x: 15, y: 115 }
     ];
 
     const DEFAULT_STAFF_LIST = [
@@ -1072,13 +1093,13 @@
     let tableSessions = JSON.parse(localStorage.getItem('NC_POS_SESSIONS')) || {};
     let currentLayout = JSON.parse(localStorage.getItem('NC_POS_LAYOUT')) || DEFAULT_LAYOUT;
     
-    if (!currentLayout.some(s => s.id === "Training")) {
-      currentLayout.push({ id: "Training", label: "🔒 Train", type: "training-seat", x: 15, y: 185 });
-    }
+    currentLayout = currentLayout.filter(s => s.id !== "Training");
+    localStorage.setItem('NC_POS_LAYOUT', JSON.stringify(currentLayout));
 
     let isEditingLayout = false;
     let currentTable = "Bar-1";
     let currentCustomer = "";
+    let selectedOrderStaff = "";
     let selectedNationality = null;
     let guestCount = 1;
 
@@ -1151,13 +1172,11 @@
 
         let w = preset.barW, h = preset.barH;
         if (seat.type === 'table-seat') { w = preset.tblW; h = preset.tblH; }
-        if (seat.type === 'training-seat') { w = preset.trnW; h = preset.trnH; }
 
         div.style.width = `${w}px`;
         div.style.height = `${h}px`;
         div.style.fontSize = `${preset.font}px`;
 
-        // 画面外飛び出しを完全に強制補正
         const maxX = Math.max(5, canvasW - w - 6);
         const maxY = Math.max(5, canvasH - h - 6);
         seat.x = Math.max(4, Math.min(seat.x, maxX));
@@ -1183,11 +1202,6 @@
             return;
           }
 
-          if (seat.id === "Training") {
-            openPinModal();
-            return;
-          }
-
           selectSeat(seat.id);
         };
 
@@ -1202,6 +1216,9 @@
       const existingSession = tableSessions[currentTable];
       currentCustomer = existingSession ? existingSession.customerName : "";
       document.getElementById('inputCustomerName').value = currentCustomer;
+
+      selectedOrderStaff = (existingSession && existingSession.orderStaff) ? existingSession.orderStaff : "";
+      document.getElementById('selectOrderStaff').value = selectedOrderStaff;
       
       guestCount = (existingSession && existingSession.guestCount) ? existingSession.guestCount : 1;
       document.getElementById('inputGuestCount').value = guestCount;
@@ -1214,6 +1231,38 @@
       }
       checkStartOrderValidation();
       renderFloorMap();
+    }
+
+    function populateStaffDropdowns() {
+      const orderStaffSel = document.getElementById('selectOrderStaff');
+      orderStaffSel.innerHTML = '<option value="" disabled selected>-- Select Server / Staff --</option>';
+      staffList.filter(s => s.id !== 'store').forEach(st => {
+        const opt = document.createElement('option');
+        opt.value = st.name;
+        opt.innerText = st.name;
+        orderStaffSel.appendChild(opt);
+      });
+
+      const cashierSel = document.getElementById('selectCashier');
+      cashierSel.innerHTML = '<option value="" disabled selected>-- Select Cashier --</option>';
+      staffList.filter(s => s.id !== 'store').forEach(st => {
+        const opt = document.createElement('option');
+        opt.value = st.name;
+        opt.innerText = st.name;
+        cashierSel.appendChild(opt);
+      });
+
+      const tipSel = document.getElementById('selectTipReceiver');
+      tipSel.innerHTML = `
+        <option value="" disabled selected>-- Select Receiver --</option>
+        <option value="No Tip">No Tip</option>
+      `;
+      staffList.forEach(st => {
+        const opt = document.createElement('option');
+        opt.value = st.name;
+        opt.innerText = st.name;
+        tipSel.appendChild(opt);
+      });
     }
 
     function openPinModal() {
@@ -1232,11 +1281,13 @@
         closePinModal();
         currentTable = "Training";
         currentCustomer = "Staff Training";
+        selectedOrderStaff = "Manager";
         selectedNationality = "Thai";
         guestCount = 1;
         
         tableSessions["Training"] = {
           customerName: "Staff Training",
+          orderStaff: "Manager",
           guestCount: 1,
           nationality: "Thai",
           orderItems: tableSessions["Training"]?.orderItems || [],
@@ -1360,21 +1411,30 @@
       checkStartOrderValidation();
     }
 
+    /* スタッフ選択・国籍・人数が揃ったか判定 */
     function checkStartOrderValidation() {
       const btn = document.querySelector('.btn-start-order');
-      if (selectedNationality && guestCount >= 1) {
+      const staffVal = document.getElementById('selectOrderStaff').value;
+
+      if (staffVal && staffVal !== "" && selectedNationality && guestCount >= 1) {
         btn.disabled = false;
         btn.style.opacity = "1";
+        btn.style.cursor = "pointer";
       } else {
         btn.disabled = true;
         btn.style.opacity = "0.4";
+        btn.style.cursor = "not-allowed";
       }
     }
 
     function openSessionModal() {
+      populateStaffDropdowns();
       const existingSession = tableSessions[currentTable];
       document.getElementById('inputCustomerName').value = (existingSession && existingSession.customerName) ? existingSession.customerName : '';
       
+      selectedOrderStaff = (existingSession && existingSession.orderStaff) ? existingSession.orderStaff : '';
+      document.getElementById('selectOrderStaff').value = selectedOrderStaff;
+
       guestCount = (existingSession && existingSession.guestCount) ? existingSession.guestCount : 1;
       document.getElementById('inputGuestCount').value = guestCount;
 
@@ -1391,6 +1451,11 @@
     }
 
     function confirmTableAndGuest() {
+      const staffVal = document.getElementById('selectOrderStaff').value;
+      if (!staffVal) {
+        alert("Please select Server / Staff");
+        return;
+      }
       if (!selectedNationality) {
         alert("Please select Nationality (Thai / Asia / Foreigner)");
         return;
@@ -1398,12 +1463,14 @@
 
       if (isEditingLayout) toggleEditMode();
 
+      selectedOrderStaff = staffVal;
       const nameInput = document.getElementById('inputCustomerName').value.trim();
       currentCustomer = nameInput !== "" ? nameInput : "Guest";
 
       if (!tableSessions[currentTable]) {
         tableSessions[currentTable] = {
           customerName: currentCustomer,
+          orderStaff: selectedOrderStaff,
           guestCount: guestCount,
           nationality: selectedNationality,
           orderItems: [],
@@ -1411,6 +1478,7 @@
         };
       } else {
         tableSessions[currentTable].customerName = currentCustomer;
+        tableSessions[currentTable].orderStaff = selectedOrderStaff;
         tableSessions[currentTable].guestCount = guestCount;
         tableSessions[currentTable].nationality = selectedNationality;
         tableSessions[currentTable].active = true;
@@ -1420,7 +1488,7 @@
       currentOrder = tableSessions[currentTable].orderItems || [];
 
       document.getElementById('headerTable').innerText = currentTable;
-      document.getElementById('headerCustomer').innerText = `${currentCustomer} (${guestCount}P / ${selectedNationality})`;
+      document.getElementById('headerCustomer').innerText = `${currentCustomer} (${selectedOrderStaff} / ${guestCount}P / ${selectedNationality})`;
       document.getElementById('sessionModal').classList.add('hidden');
       renderOrder();
     }
@@ -1661,29 +1729,6 @@
       }, 3000);
     }
 
-    function populateDropdowns() {
-      const cashierSel = document.getElementById('selectCashier');
-      cashierSel.innerHTML = '<option value="" disabled selected>-- Select Cashier --</option>';
-      staffList.filter(s => s.id !== 'store').forEach(st => {
-        const opt = document.createElement('option');
-        opt.value = st.name;
-        opt.innerText = st.name;
-        cashierSel.appendChild(opt);
-      });
-
-      const tipSel = document.getElementById('selectTipReceiver');
-      tipSel.innerHTML = `
-        <option value="" disabled selected>-- Select Receiver --</option>
-        <option value="No Tip">No Tip</option>
-      `;
-      staffList.forEach(st => {
-        const opt = document.createElement('option');
-        opt.value = st.name;
-        opt.innerText = st.name;
-        tipSel.appendChild(opt);
-      });
-    }
-
     function onCashierChanged() {
       selectedCashier = document.getElementById('selectCashier').value;
       const btnCash = document.getElementById('btnMethodCash');
@@ -1711,8 +1756,14 @@
       const total = currentOrder.reduce((acc, i) => acc + (i.price * i.quantity), 0);
       document.getElementById('modalTotalDisplay').innerText = `฿${total}`;
       
-      populateDropdowns();
-      resetPaymentState();
+      populateStaffDropdowns();
+      // 直前の担当スタッフがいればデフォルト選択
+      if (selectedOrderStaff) {
+        document.getElementById('selectCashier').value = selectedOrderStaff;
+        onCashierChanged();
+      } else {
+        resetPaymentState();
+      }
       
       document.getElementById('paymentStepSelect').classList.remove('hidden');
       document.getElementById('paymentStepTip').classList.add('hidden');
@@ -2017,7 +2068,7 @@
         tipAmount: tipAmount,
         tipReceiver: tipReceiver,
         slipImageBase64: selectedPayment === 'Scan' ? slipImageBase64 : null,
-        staffName: selectedCashier || "Staff",
+        staffName: selectedCashier || sessionData.orderStaff || "Staff",
         items: currentOrder.map(i => ({
           name: i.name,
           category: i.category,

@@ -14,13 +14,16 @@
     }
     html, body {
       width: 100%;
+      max-width: 100vw;
       height: 100%;
       height: 100dvh;
-      overflow: hidden;
+      overflow-x: hidden !important;
+      overflow-y: hidden;
       background-color: #f1f5f9;
       color: #1e293b;
       user-select: none;
       -webkit-user-select: none;
+      position: fixed;
     }
     body {
       display: flex;
@@ -41,6 +44,7 @@
       height: 100%;
       border-right: 2px solid #e2e8f0;
       min-width: 0;
+      overflow-x: hidden;
     }
     .header-bar {
       background: #ffffff;
@@ -117,6 +121,7 @@
       flex: 1;
       padding: 14px;
       overflow-y: auto;
+      overflow-x: hidden;
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
       gap: 12px;
@@ -336,10 +341,12 @@
       z-index: 40;
     }
 
-    /* モーダル */
+    /* モーダル枠を中央に完全固定 */
     .modal-overlay {
       position: fixed;
       inset: 0;
+      width: 100vw;
+      height: 100dvh;
       background: rgba(15, 23, 42, 0.7);
       backdrop-filter: blur(4px);
       display: flex;
@@ -347,20 +354,21 @@
       justify-content: center;
       padding: 12px;
       z-index: 999;
+      overflow: hidden;
     }
     .modal-card {
       background: #ffffff;
       border-radius: 20px;
       width: 100%;
-      max-width: 600px;
-      padding: 18px;
+      max-width: 500px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
       gap: 12px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
       max-height: 94vh;
       overflow-y: auto;
-      overflow-x: hidden;
+      overflow-x: hidden !important;
     }
     .modal-header {
       display: flex;
@@ -372,15 +380,15 @@
       z-index: 20;
     }
 
-    /* フロアマップ領域：はみ出しを完全禁止 */
+    /* フロアマップ領域：はみ出し完全防止 */
     .floor-canvas-container {
       position: relative;
       width: 100%;
-      height: 290px;
+      height: 280px;
       background: #f8fafc;
       border: 2px dashed #cbd5e1;
       border-radius: 14px;
-      overflow: hidden;
+      overflow: hidden !important;
       touch-action: none;
       z-index: 10;
     }
@@ -396,7 +404,6 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      border-radius: 12px;
       font-weight: 800;
       box-shadow: 0 2px 4px rgba(0,0,0,0.06);
       transition: width 0.15s, height 0.15s, font-size 0.15s;
@@ -474,16 +481,16 @@
     /* 5段階サイズセレクタのボタンスタイル */
     .size-btn-group {
       display: flex;
-      gap: 4px;
+      gap: 3px;
       align-items: center;
       background: #e2e8f0;
-      padding: 4px;
+      padding: 3px;
       border-radius: 8px;
     }
     .btn-size-choice {
       border: none;
       background: transparent;
-      padding: 4px 8px;
+      padding: 3px 6px;
       font-size: 11px;
       font-weight: 800;
       border-radius: 6px;
@@ -666,7 +673,7 @@
       <!-- フロアマップ領域 -->
       <div id="floorCanvas" class="floor-canvas-container"></div>
 
-      <!-- 編集モードツールボタン（5段階サイズ切り替えボタン付き） -->
+      <!-- 編集モードツールボタン -->
       <div id="editToolsBlock" class="hidden" style="display: flex; flex-direction: column; gap: 8px;">
         <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border: 1.5px solid #cbd5e1; padding: 6px 10px; border-radius: 10px;">
           <span style="font-size: 12px; font-weight: 800; color: #475569;">Icon Size:</span>
@@ -973,13 +980,11 @@
           Cashier: <span id="displayActiveCashier" style="color: #ea580c;"></span>
         </div>
 
-        <!-- Cash時専用：特大お釣り表示枠 -->
         <div id="tipScreenChangeBox" class="hidden" style="background: #f0fdf4; border: 3px solid #16a34a; border-radius: 16px; padding: 16px 12px; text-align: center; margin-top: 10px; box-shadow: 0 4px 6px -1px rgba(22, 163, 74, 0.15);">
           <div style="font-size: 14px; font-weight: 800; color: #166534; letter-spacing: 0.5px; text-transform: uppercase;">Change Due (お釣り)</div>
           <div id="tipScreenChangeAmount" style="font-size: 38px; font-weight: 900; color: #15803d; line-height: 1.1; margin-top: 4px;">฿0</div>
         </div>
 
-        <!-- Scan時専用：金額入力・Tip自動計算ブロック -->
         <div id="scanTipCalculationBlock" class="hidden" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px; background: #fff7ed; border: 1.5px solid #fed7aa; border-radius: 12px; padding: 12px;">
           <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 800; color: #7c2d12;">
             <span>Order Total:</span>
@@ -997,13 +1002,11 @@
           </div>
         </div>
 
-        <!-- Cash時用：Tip入力欄 -->
         <div id="cashTipDirectBlock" style="margin-top: 10px;">
           <label style="display: block; font-size: 13px; font-weight: 800; color: #475569; margin-bottom: 4px;">Tip Amount (฿)</label>
           <input type="number" id="inputTipAmount" min="0" placeholder="0" oninput="validateFinalPaymentButton()" style="width: 100%; border: 2px solid #cbd5e1; border-radius: 10px; padding: 12px; font-size: 18px; font-weight: 800; color: #1e293b; outline: none; user-select: text !important; -webkit-user-select: text !important;">
         </div>
 
-        <!-- 受取人選択（No Tip + スタッフ登録メンバー） -->
         <div style="margin-top: 10px;">
           <label style="display: block; font-size: 12px; font-weight: 800; color: #64748b; margin-bottom: 4px;">
             Tip Receiver <span style="color: #ef4444;">*</span>
@@ -1036,26 +1039,26 @@
     const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwTQxVoIEsO-y3GUxrD_1MUbCszDfiC1RpMGhsQVAmwZqdxBRTwQqBrLdMVW-TP4kgBrQ/exec";
     const MANAGER_PIN = "1536";
 
-    // 5段階サイズ定義 (XS: 1, S: 2, M: 3, L: 4, XL: 5)
     const SCALE_PRESETS = {
-      1: { barW: 44, barH: 44, tblW: 56, tblH: 46, trnW: 38, trnH: 38, font: 10 },
-      2: { barW: 52, barH: 52, tblW: 68, tblH: 56, trnW: 44, trnH: 44, font: 11 },
-      3: { barW: 60, barH: 60, tblW: 78, tblH: 64, trnW: 50, trnH: 50, font: 12 },
-      4: { barW: 70, barH: 70, tblW: 90, tblH: 74, trnW: 58, trnH: 58, font: 13 },
-      5: { barW: 80, barH: 80, tblW: 104, tblH: 86, trnW: 66, trnH: 66, font: 15 }
+      1: { barW: 42, barH: 42, tblW: 54, tblH: 44, trnW: 36, trnH: 36, font: 10 },
+      2: { barW: 50, barH: 50, tblW: 66, tblH: 54, trnW: 42, trnH: 42, font: 11 },
+      3: { barW: 58, barH: 58, tblW: 76, tblH: 62, trnW: 48, trnH: 48, font: 12 },
+      4: { barW: 66, barH: 66, tblW: 86, tblH: 70, trnW: 54, trnH: 54, font: 13 },
+      5: { barW: 76, barH: 76, tblW: 98, tblH: 80, trnW: 62, trnH: 62, font: 14 }
     };
     let currentScaleLevel = parseInt(localStorage.getItem('NC_POS_SEAT_SCALE')) || 3;
 
+    // スマホ縦画面でも綺麗に納まる初期レイアウト
     const DEFAULT_LAYOUT = [
-      { id: "Bar-1", label: "Bar-1", type: "bar-seat", x: 20, y: 20 },
-      { id: "Bar-2", label: "Bar-2", type: "bar-seat", x: 85, y: 20 },
-      { id: "Bar-3", label: "Bar-3", type: "bar-seat", x: 150, y: 20 },
-      { id: "Bar-4", label: "Bar-4", type: "bar-seat", x: 215, y: 20 },
-      { id: "T-1", label: "Table-1", type: "table-seat", x: 240, y: 90 },
-      { id: "T-2", label: "Table-2", type: "table-seat", x: 240, y: 165 },
-      { id: "T-3", label: "Table-3", type: "table-seat", x: 130, y: 140 },
-      { id: "T-4", label: "Table-4", type: "table-seat", x: 20, y: 140 },
-      { id: "Training", label: "🔒 Train", type: "training-seat", x: 20, y: 220 }
+      { id: "Bar-1", label: "C1", type: "bar-seat", x: 15, y: 15 },
+      { id: "Bar-2", label: "C2", type: "bar-seat", x: 75, y: 15 },
+      { id: "Bar-3", label: "C3", type: "bar-seat", x: 135, y: 15 },
+      { id: "Bar-4", label: "C4", type: "bar-seat", x: 195, y: 15 },
+      { id: "T-1", label: "Table-1", type: "table-seat", x: 195, y: 85 },
+      { id: "T-2", label: "Table-2", type: "table-seat", x: 195, y: 155 },
+      { id: "T-3", label: "Table-3", type: "table-seat", x: 105, y: 115 },
+      { id: "T-4", label: "Table-4", type: "table-seat", x: 15, y: 115 },
+      { id: "Training", label: "🔒 Train", type: "training-seat", x: 15, y: 185 }
     ];
 
     const DEFAULT_STAFF_LIST = [
@@ -1070,7 +1073,7 @@
     let currentLayout = JSON.parse(localStorage.getItem('NC_POS_LAYOUT')) || DEFAULT_LAYOUT;
     
     if (!currentLayout.some(s => s.id === "Training")) {
-      currentLayout.push({ id: "Training", label: "🔒 Train", type: "training-seat", x: 20, y: 220 });
+      currentLayout.push({ id: "Training", label: "🔒 Train", type: "training-seat", x: 15, y: 185 });
     }
 
     let isEditingLayout = false;
@@ -1134,6 +1137,8 @@
       const canvas = document.getElementById('floorCanvas');
       canvas.innerHTML = '';
       const preset = SCALE_PRESETS[currentScaleLevel] || SCALE_PRESETS[3];
+      const canvasW = canvas.clientWidth || 320;
+      const canvasH = canvas.clientHeight || 240;
 
       currentLayout.forEach(seat => {
         const div = document.createElement('div');
@@ -1144,7 +1149,6 @@
         div.className = `floor-item ${seat.type} ${isOccupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}`;
         div.id = `seat-${seat.id}`;
 
-        // 5段階プリセットに合わせたサイズとフォント適用
         let w = preset.barW, h = preset.barH;
         if (seat.type === 'table-seat') { w = preset.tblW; h = preset.tblH; }
         if (seat.type === 'training-seat') { w = preset.trnW; h = preset.trnH; }
@@ -1153,11 +1157,11 @@
         div.style.height = `${h}px`;
         div.style.fontSize = `${preset.font}px`;
 
-        // キャンバスはみ出し防止
-        const maxX = Math.max(10, canvas.clientWidth - w - 4);
-        const maxY = Math.max(10, canvas.clientHeight - h - 4);
-        seat.x = Math.min(seat.x, maxX);
-        seat.y = Math.min(seat.y, maxY);
+        // 画面外飛び出しを完全に強制補正
+        const maxX = Math.max(5, canvasW - w - 6);
+        const maxY = Math.max(5, canvasH - h - 6);
+        seat.x = Math.max(4, Math.min(seat.x, maxX));
+        seat.y = Math.max(4, Math.min(seat.y, maxY));
 
         div.style.left = `${seat.x}px`;
         div.style.top = `${seat.y}px`;
@@ -1327,7 +1331,7 @@
         id: newId,
         label: newId,
         type: type === 'Bar' ? 'bar-seat' : 'table-seat',
-        x: 30 + (count * 10),
+        x: 20 + (count * 10),
         y: 60
       });
       saveLayoutToStorage();
@@ -1335,7 +1339,7 @@
     }
 
     function resetDefaultLayout() {
-      if (confirm("Reset floor layout to default?")) {
+      if (confirm("Reset floor layout to mobile-fit default?")) {
         currentLayout = JSON.parse(JSON.stringify(DEFAULT_LAYOUT));
         saveLayoutToStorage();
         renderFloorMap();

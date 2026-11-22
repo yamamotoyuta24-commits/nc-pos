@@ -92,6 +92,56 @@
       color: #64748b;
     }
 
+    /* 全体商品検索バー */
+    .search-bar-container {
+      background: #f8fafc;
+      padding: 8px 12px 4px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .search-input-wrapper {
+      position: relative;
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+    .menu-search-input {
+      width: 100%;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 9px 36px 9px 14px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #1e293b;
+      background: #ffffff;
+      outline: none;
+      user-select: text !important;
+      -webkit-user-select: text !important;
+    }
+    .menu-search-input:focus {
+      border-color: #ea580c;
+    }
+    .btn-clear-search {
+      position: absolute;
+      right: 8px;
+      background: #e2e8f0;
+      color: #475569;
+      border: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      font-size: 14px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-clear-search:active {
+      background: #cbd5e1;
+    }
+
     /* カテゴリタブ */
     .cat-bar {
       display: flex;
@@ -780,6 +830,14 @@
       </div>
     </div>
 
+    <!-- 全体商品検索バー（カテゴリータブの上部） -->
+    <div class="search-bar-container">
+      <div class="search-input-wrapper">
+        <input type="text" id="menuSearchInput" class="menu-search-input" placeholder="🔍 Search all items..." oninput="handleMenuSearch()" autocomplete="off">
+        <button type="button" id="btnClearSearch" class="btn-clear-search hidden" onclick="clearMenuSearch()">&times;</button>
+      </div>
+    </div>
+
     <!-- Category Tabs -->
     <div class="cat-bar" id="categoryTabs">
       <button type="button" class="cat-btn active" onclick="filterCategory('All', this)">ALL</button>
@@ -1133,6 +1191,7 @@
     let selectedNationality = null;
     let guestCount = 1;
     let currentCategory = "All";
+    let currentSearchQuery = "";
 
     let currentOrder = [];
     let selectedPayment = null;
@@ -1556,6 +1615,33 @@
       renderOrder();
     }
 
+    /* ==================== 全体商品検索バー制御 ==================== */
+    function handleMenuSearch() {
+      const inputEl = document.getElementById('menuSearchInput');
+      const clearBtn = document.getElementById('btnClearSearch');
+      currentSearchQuery = inputEl.value.trim().toLowerCase();
+
+      if (currentSearchQuery !== "") {
+        clearBtn.classList.remove('hidden');
+        // 全体検索時はカテゴリー選択を「ALL」に視覚的・論理的に切り替え
+        if (currentCategory !== "All") {
+          currentCategory = "All";
+          renderCategoryTabs();
+        }
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+      renderMenu(currentCategory);
+    }
+
+    function clearMenuSearch() {
+      const inputEl = document.getElementById('menuSearchInput');
+      inputEl.value = "";
+      currentSearchQuery = "";
+      document.getElementById('btnClearSearch').classList.add('hidden');
+      renderMenu(currentCategory);
+    }
+
     /* カテゴリタブ動的生成 */
     function renderCategoryTabs() {
       const tabsContainer = document.getElementById('categoryTabs');
@@ -1576,7 +1662,24 @@
       currentCategory = category;
       const grid = document.getElementById('menuGrid');
       grid.innerHTML = '';
-      const filtered = category === 'All' ? menuItems : menuItems.filter(i => i.category === category);
+
+      let filtered = menuItems;
+
+      // 検索ワードがある場合はカテゴリー問わず全商品から検索
+      if (currentSearchQuery !== "") {
+        filtered = menuItems.filter(i => {
+          const nameEn = (i.name || "").toLowerCase();
+          const nameJa = (i.nameJa || "").toLowerCase();
+          return nameEn.includes(currentSearchQuery) || nameJa.includes(currentSearchQuery);
+        });
+      } else if (category !== 'All') {
+        filtered = menuItems.filter(i => i.category === category);
+      }
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #94a3b8; margin-top: 24px; font-weight: 700; font-size: 14px;">No matching items found</p>';
+        return;
+      }
 
       filtered.forEach(item => {
         const btn = document.createElement('div');
@@ -1592,6 +1695,12 @@
 
     function filterCategory(cat, el) {
       currentCategory = cat;
+      // カテゴリータブを直接押したら検索窓はクリアする
+      if (currentSearchQuery !== "") {
+        document.getElementById('menuSearchInput').value = "";
+        currentSearchQuery = "";
+        document.getElementById('btnClearSearch').classList.add('hidden');
+      }
       document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
       el.classList.add('active');
       renderMenu(cat);

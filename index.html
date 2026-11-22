@@ -189,10 +189,20 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.04);
       text-align: left;
     }
-    .menu-card:active {
+    .menu-card:not(.menu-card-disabled):active {
       transform: scale(0.96);
       background: #fff7ed;
       border-color: #ea580c;
+    }
+    .menu-card.menu-card-disabled {
+      background: #f1f5f9;
+      border-color: #e2e8f0;
+      opacity: 0.55;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .menu-card.menu-card-disabled .menu-name {
+      color: #64748b;
     }
     .menu-name {
       font-size: 15px;
@@ -1158,16 +1168,16 @@
     ];
 
     const FALLBACK_MENU = [
-      { id: "M01", name: "Singha Beer", category: "Beer", price: 120, totalCost: 45, grossProfit: 75 },
-      { id: "M02", name: "Chang Beer", category: "Beer", price: 100, totalCost: 40, grossProfit: 60 },
-      { id: "M03", name: "Leo Beer", category: "Beer", price: 100, totalCost: 40, grossProfit: 60 },
-      { id: "M04", name: "Gin Tonic", category: "Cocktail", price: 180, totalCost: 35, grossProfit: 145 },
-      { id: "M05", name: "Highball", category: "Cocktail", price: 160, totalCost: 30, grossProfit: 130 },
-      { id: "M06", name: "Mojito", category: "Cocktail", price: 200, totalCost: 40, grossProfit: 160 },
-      { id: "M07", name: "French Fries", category: "Food", price: 120, totalCost: 35, grossProfit: 85 },
-      { id: "M08", name: "Edamame", category: "Food", price: 80, totalCost: 25, grossProfit: 55 },
-      { id: "M09", name: "Cat Snack", category: "Other", price: 50, totalCost: 15, grossProfit: 35 },
-      { id: "M10", name: "Water", category: "Other", price: 40, totalCost: 10, grossProfit: 30 }
+      { id: "M01", name: "Singha Beer", category: "Beer", price: 120, hasPrice: true, totalCost: 45, grossProfit: 75 },
+      { id: "M02", name: "Chang Beer", category: "Beer", price: 100, hasPrice: true, totalCost: 40, grossProfit: 60 },
+      { id: "M03", name: "Leo Beer", category: "Beer", price: 100, hasPrice: true, totalCost: 40, grossProfit: 60 },
+      { id: "M04", name: "Gin Tonic", category: "Cocktail", price: 180, hasPrice: true, totalCost: 35, grossProfit: 145 },
+      { id: "M05", name: "Highball", category: "Cocktail", price: 160, hasPrice: true, totalCost: 30, grossProfit: 130 },
+      { id: "M06", name: "Mojito", category: "Cocktail", price: 200, hasPrice: true, totalCost: 40, grossProfit: 160 },
+      { id: "M07", name: "French Fries", category: "Food", price: 120, hasPrice: true, totalCost: 35, grossProfit: 85 },
+      { id: "M08", name: "Edamame", category: "Food", price: 80, hasPrice: true, totalCost: 25, grossProfit: 55 },
+      { id: "M09", name: "Cat Snack", category: "Other", price: 50, hasPrice: true, totalCost: 15, grossProfit: 35 },
+      { id: "M10", name: "Water", category: "Other", price: 40, hasPrice: true, totalCost: 10, grossProfit: 30 }
     ];
 
     const FALLBACK_STAFF = [
@@ -1657,6 +1667,13 @@
       });
     }
 
+    /* 売単価が空欄かどうかを判定 */
+    function isItemUnpriced(item) {
+      if (item.hasPrice === false) return true;
+      if (item.price === null || item.price === undefined || item.price === "") return true;
+      return isNaN(Number(item.price));
+    }
+
     function renderMenu(category = 'All') {
       currentCategory = category;
       const grid = document.getElementById('menuGrid');
@@ -1680,12 +1697,18 @@
       }
 
       filtered.forEach(item => {
+        const unpriced = isItemUnpriced(item);
         const btn = document.createElement('div');
-        btn.className = "menu-card";
-        btn.onclick = () => addItemToOrder(item);
+        btn.className = `menu-card ${unpriced ? 'menu-card-disabled' : ''}`;
+
+        if (!unpriced) {
+          btn.onclick = () => addItemToOrder(item);
+        }
+
+        const priceHtml = unpriced ? '' : `<div class="menu-price">฿${Number(item.price)}</div>`;
         btn.innerHTML = `
           <div class="menu-name">${item.name}</div>
-          <div class="menu-price">฿${item.price}</div>
+          ${priceHtml}
         `;
         grid.appendChild(btn);
       });
@@ -1704,14 +1727,18 @@
     }
 
     function addItemToOrder(item) {
+      if (isItemUnpriced(item)) return;
+
+      const numericPrice = Number(item.price) || 0;
       const unconfirmed = currentOrder.find(i => i.id === item.id && !i.confirmed);
       if (unconfirmed) {
         unconfirmed.quantity += 1;
       } else {
         const unitCost = Number(item.totalCost) || 0;
-        const unitProfit = (item.grossProfit !== undefined) ? Number(item.grossProfit) : (item.price - unitCost);
+        const unitProfit = (item.grossProfit !== undefined) ? Number(item.grossProfit) : (numericPrice - unitCost);
         currentOrder.push({
           ...item,
+          price: numericPrice,
           totalCost: unitCost,
           grossProfit: unitProfit,
           quantity: 1,
@@ -1942,7 +1969,7 @@
       toggleSpCart(false);
 
       if (currentTable === "Training") {
-        if (confirm("Finalize training order? Drinks will be recorded for stock inventory.")) {
+        if (confirm("Finalize training order? Drinks & food will be recorded for stock inventory.")) {
           submitTrainingTransaction();
         }
         return;
@@ -2044,7 +2071,7 @@
 
       const btn = document.getElementById('btnProceedCashTip');
 
-      if (val >= total && total > 0) {
+      if (val >= total) {
         changeDueAmount = val - total;
         btn.disabled = false;
         btn.style.background = "#ea580c";
@@ -2124,7 +2151,7 @@
       const paid = parseFloat(paidInput) || 0;
       
       let tip = 0;
-      if (paid >= total && total > 0) {
+      if (paid >= total) {
         tip = paid - total;
       }
 

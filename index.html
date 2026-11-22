@@ -663,7 +663,7 @@
 </head>
 <body>
 
-  <!-- ==================== 初期テーブル＆名前入力モーダル（フロアマップ） ==================== -->
+  <!-- ==================== 初期テーブル＆名前入力モーダル ==================== -->
   <div id="sessionModal" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">
@@ -707,7 +707,7 @@
         </div>
       </div>
 
-      <!-- 受付スタッフ（Server）選択プルダウン（復活） -->
+      <!-- 受付スタッフ（Server）選択プルダウン -->
       <div>
         <label style="display: block; font-size: 12px; font-weight: 800; color: #1e293b; margin-bottom: 4px;">
           Server / Staff <span style="color: #ef4444;">*</span>
@@ -778,16 +778,15 @@
           <span class="badge-customer" id="headerCustomer">Guest</span>
         </div>
       </div>
-      <div class="clock-display" id="clock">00:00:00</div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span id="syncStatus" style="font-size: 11px; font-weight: 700; color: #16a34a;">● Live</span>
+        <div class="clock-display" id="clock">00:00:00</div>
+      </div>
     </div>
 
     <!-- Category Tabs -->
     <div class="cat-bar" id="categoryTabs">
       <button type="button" class="cat-btn active" onclick="filterCategory('All', this)">ALL</button>
-      <button type="button" class="cat-btn" onclick="filterCategory('Beer', this)">Beer</button>
-      <button type="button" class="cat-btn" onclick="filterCategory('Cocktail', this)">Cocktail</button>
-      <button type="button" class="cat-btn" onclick="filterCategory('Food', this)">Food</button>
-      <button type="button" class="cat-btn" onclick="filterCategory('Other', this)">Other</button>
     </div>
 
     <!-- Menu Grid -->
@@ -1082,28 +1081,7 @@
       { id: "T-4", label: "Table-4", type: "table-seat", x: 15, y: 115 }
     ];
 
-    const DEFAULT_STAFF_LIST = [
-      { id: "store", name: "Store" },
-      { id: "staff1", name: "Staff 1" },
-      { id: "staff2", name: "Staff 2" },
-      { id: "staff3", name: "Staff 3" }
-    ];
-
-    let staffList = JSON.parse(localStorage.getItem('NC_POS_STAFF_LIST')) || DEFAULT_STAFF_LIST;
-    let tableSessions = JSON.parse(localStorage.getItem('NC_POS_SESSIONS')) || {};
-    let currentLayout = JSON.parse(localStorage.getItem('NC_POS_LAYOUT')) || DEFAULT_LAYOUT;
-    
-    currentLayout = currentLayout.filter(s => s.id !== "Training");
-    localStorage.setItem('NC_POS_LAYOUT', JSON.stringify(currentLayout));
-
-    let isEditingLayout = false;
-    let currentTable = "Bar-1";
-    let currentCustomer = "";
-    let selectedOrderStaff = "";
-    let selectedNationality = null;
-    let guestCount = 1;
-
-    const MENU_ITEMS = [
+    const FALLBACK_MENU = [
       { id: "M01", name: "Singha Beer", category: "Beer", price: 120 },
       { id: "M02", name: "Chang Beer", category: "Beer", price: 100 },
       { id: "M03", name: "Leo Beer", category: "Beer", price: 100 },
@@ -1116,6 +1094,29 @@
       { id: "M10", name: "Water", category: "Other", price: 40 }
     ];
 
+    const FALLBACK_STAFF = [
+      { id: "store", name: "Store" },
+      { id: "staff1", name: "Staff 1" },
+      { id: "staff2", name: "Staff 2" },
+      { id: "staff3", name: "Staff 3" }
+    ];
+
+    let menuItems = JSON.parse(localStorage.getItem('NC_POS_MENU_CACHE')) || FALLBACK_MENU;
+    let staffList = JSON.parse(localStorage.getItem('NC_POS_STAFF_CACHE')) || FALLBACK_STAFF;
+    let tableSessions = JSON.parse(localStorage.getItem('NC_POS_SESSIONS')) || {};
+    let currentLayout = JSON.parse(localStorage.getItem('NC_POS_LAYOUT')) || DEFAULT_LAYOUT;
+    
+    currentLayout = currentLayout.filter(s => s.id !== "Training");
+    localStorage.setItem('NC_POS_LAYOUT', JSON.stringify(currentLayout));
+
+    let isEditingLayout = false;
+    let currentTable = "Bar-1";
+    let currentCustomer = "";
+    let selectedOrderStaff = "";
+    let selectedNationality = null;
+    let guestCount = 1;
+    let currentCategory = "All";
+
     let currentOrder = [];
     let selectedPayment = null;
     let slipImageBase64 = null;
@@ -1127,6 +1128,40 @@
     setInterval(() => {
       document.getElementById('clock').innerText = new Date().toLocaleTimeString();
     }, 1000);
+
+    /* ==================== GASからの動的データ取得（SWRキャッシュ方式） ==================== */
+    async function fetchMasterData() {
+      const syncEl = document.getElementById('syncStatus');
+      syncEl.innerText = "⟳ Syncing...";
+      syncEl.style.color = "#ea580c";
+
+      try {
+        const res = await fetch(`${GAS_ENDPOINT}?action=getMasterData`);
+        if (!res.ok) throw new Error("Sync failed");
+        const data = await res.json();
+
+        if (data.status === "success") {
+          if (data.menu && data.menu.length > 0) {
+            menuItems = data.menu;
+            localStorage.setItem('NC_POS_MENU_CACHE', JSON.stringify(menuItems));
+          }
+          if (data.staff && data.staff.length > 0) {
+            staffList = data.staff;
+            localStorage.setItem('NC_POS_STAFF_CACHE', JSON.stringify(staffList));
+          }
+          syncEl.innerText = "● Live";
+          syncEl.style.color = "#16a34a";
+          
+          renderCategoryTabs();
+          renderMenu(currentCategory);
+          populateStaffDropdowns();
+        }
+      } catch (err) {
+        console.warn("GAS fetch fallback to cache:", err);
+        syncEl.innerText = "● Cache";
+        syncEl.style.color = "#64748b";
+      }
+    }
 
     function toggleSpCart(open) {
       const cart = document.getElementById('cartSidebar');
@@ -1235,6 +1270,7 @@
 
     function populateStaffDropdowns() {
       const orderStaffSel = document.getElementById('selectOrderStaff');
+      const curOrderVal = orderStaffSel.value;
       orderStaffSel.innerHTML = '<option value="" disabled selected>-- Select Server / Staff --</option>';
       staffList.filter(s => s.id !== 'store').forEach(st => {
         const opt = document.createElement('option');
@@ -1242,8 +1278,10 @@
         opt.innerText = st.name;
         orderStaffSel.appendChild(opt);
       });
+      if (curOrderVal) orderStaffSel.value = curOrderVal;
 
       const cashierSel = document.getElementById('selectCashier');
+      const curCashierVal = cashierSel.value;
       cashierSel.innerHTML = '<option value="" disabled selected>-- Select Cashier --</option>';
       staffList.filter(s => s.id !== 'store').forEach(st => {
         const opt = document.createElement('option');
@@ -1251,8 +1289,10 @@
         opt.innerText = st.name;
         cashierSel.appendChild(opt);
       });
+      if (curCashierVal) cashierSel.value = curCashierVal;
 
       const tipSel = document.getElementById('selectTipReceiver');
+      const curTipVal = tipSel.value;
       tipSel.innerHTML = `
         <option value="" disabled selected>-- Select Receiver --</option>
         <option value="No Tip">No Tip</option>
@@ -1263,6 +1303,7 @@
         opt.innerText = st.name;
         tipSel.appendChild(opt);
       });
+      if (curTipVal) tipSel.value = curTipVal;
     }
 
     function openPinModal() {
@@ -1411,7 +1452,6 @@
       checkStartOrderValidation();
     }
 
-    /* スタッフ選択・国籍・人数が揃ったか判定 */
     function checkStartOrderValidation() {
       const btn = document.querySelector('.btn-start-order');
       const staffVal = document.getElementById('selectOrderStaff').value;
@@ -1493,10 +1533,27 @@
       renderOrder();
     }
 
+    /* カテゴリタブ動的生成 */
+    function renderCategoryTabs() {
+      const tabsContainer = document.getElementById('categoryTabs');
+      const categories = ["All", ...new Set(menuItems.map(item => item.category).filter(Boolean))];
+      
+      tabsContainer.innerHTML = '';
+      categories.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `cat-btn ${cat === currentCategory ? 'active' : ''}`;
+        btn.innerText = cat.toUpperCase();
+        btn.onclick = () => filterCategory(cat, btn);
+        tabsContainer.appendChild(btn);
+      });
+    }
+
     function renderMenu(category = 'All') {
+      currentCategory = category;
       const grid = document.getElementById('menuGrid');
       grid.innerHTML = '';
-      const filtered = category === 'All' ? MENU_ITEMS : MENU_ITEMS.filter(i => i.category === category);
+      const filtered = category === 'All' ? menuItems : menuItems.filter(i => i.category === category);
 
       filtered.forEach(item => {
         const btn = document.createElement('div');
@@ -1511,6 +1568,7 @@
     }
 
     function filterCategory(cat, el) {
+      currentCategory = cat;
       document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
       el.classList.add('active');
       renderMenu(cat);
@@ -1753,358 +1811,4 @@
         return;
       }
 
-      const total = currentOrder.reduce((acc, i) => acc + (i.price * i.quantity), 0);
-      document.getElementById('modalTotalDisplay').innerText = `฿${total}`;
-      
-      populateStaffDropdowns();
-      // 直前の担当スタッフがいればデフォルト選択
-      if (selectedOrderStaff) {
-        document.getElementById('selectCashier').value = selectedOrderStaff;
-        onCashierChanged();
-      } else {
-        resetPaymentState();
-      }
-      
-      document.getElementById('paymentStepSelect').classList.remove('hidden');
-      document.getElementById('paymentStepTip').classList.add('hidden');
-      document.getElementById('paymentSuccessContent').classList.add('hidden');
-      document.getElementById('paymentModal').classList.remove('hidden');
-    }
-
-    function closePaymentModal() {
-      document.getElementById('paymentModal').classList.add('hidden');
-      resetPaymentState();
-    }
-
-    function resetPaymentState() {
-      selectedPayment = null;
-      slipImageBase64 = null;
-      isSlipConfirmed = false;
-      receivedCashAmount = 0;
-      changeDueAmount = 0;
-      selectedCashier = "";
-
-      document.getElementById('selectCashier').value = "";
-      document.getElementById('cashArea').classList.add('hidden');
-      document.getElementById('promptPayArea').classList.add('hidden');
-      document.getElementById('slipPreviewBlock').classList.add('hidden');
-      document.getElementById('cameraActionBlock').classList.remove('hidden');
-      
-      const btnCash = document.getElementById('btnMethodCash');
-      const btnPP = document.getElementById('btnMethodPP');
-      btnCash.classList.remove('selected');
-      btnPP.classList.remove('selected');
-      btnCash.disabled = true;
-      btnPP.disabled = true;
-      
-      document.getElementById('inputReceivedCash').value = '';
-      
-      const btnProceedCash = document.getElementById('btnProceedCashTip');
-      btnProceedCash.disabled = true;
-      btnProceedCash.style.background = "#cbd5e1";
-      btnProceedCash.style.color = "#64748b";
-      
-      const btnProceedScan = document.getElementById('btnProceedScanTip');
-      btnProceedScan.disabled = true;
-      btnProceedScan.style.background = "#cbd5e1";
-      btnProceedScan.style.color = "#64748b";
-
-      const btnConfirm = document.getElementById('btnConfirmSlip');
-      btnConfirm.innerText = "Confirm OK";
-      btnConfirm.style.background = "#16a34a";
-
-      document.getElementById('inputTipAmount').value = '';
-      document.getElementById('inputScanPaidAmount').value = '';
-      document.getElementById('scanCalculatedTipDisplay').innerText = '฿0';
-    }
-
-    function selectMethod(method) {
-      if (!selectedCashier) {
-        alert("Please select Cashier first.");
-        return;
-      }
-
-      selectedPayment = method;
-      const btnCash = document.getElementById('btnMethodCash');
-      const btnPP = document.getElementById('btnMethodPP');
-      const cashArea = document.getElementById('cashArea');
-      const ppArea = document.getElementById('promptPayArea');
-
-      if (method === 'Cash') {
-        btnCash.classList.add('selected');
-        btnPP.classList.remove('selected');
-        cashArea.classList.remove('hidden');
-        ppArea.classList.add('hidden');
-      } else {
-        btnPP.classList.add('selected');
-        btnCash.classList.remove('selected');
-        ppArea.classList.remove('hidden');
-        cashArea.classList.add('hidden');
-      }
-    }
-
-    function checkCashReceivedInput() {
-      const total = currentOrder.reduce((acc, i) => acc + (i.price * i.quantity), 0);
-      const val = parseFloat(document.getElementById('inputReceivedCash').value) || 0;
-      receivedCashAmount = val;
-
-      const btn = document.getElementById('btnProceedCashTip');
-
-      if (val >= total && total > 0) {
-        changeDueAmount = val - total;
-        btn.disabled = false;
-        btn.style.background = "#ea580c";
-        btn.style.color = "#ffffff";
-      } else {
-        changeDueAmount = 0;
-        btn.disabled = true;
-        btn.style.background = "#cbd5e1";
-        btn.style.color = "#64748b";
-      }
-    }
-
-    function handleSlipCapture(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        slipImageBase64 = event.target.result;
-        document.getElementById('slipPreviewImg').src = slipImageBase64;
-        document.getElementById('cameraActionBlock').classList.add('hidden');
-        document.getElementById('slipPreviewBlock').classList.remove('hidden');
-        isSlipConfirmed = false;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function confirmSlipPhoto() {
-      if (!slipImageBase64) return;
-      isSlipConfirmed = true;
-      const btn = document.getElementById('btnConfirmSlip');
-      btn.innerText = "✓ Confirmed";
-      btn.style.background = "#64748b";
-
-      proceedToTipScreen();
-    }
-
-    function proceedToTipScreen() {
-      if (selectedPayment === 'Scan' && !slipImageBase64) {
-        alert("Please take a photo of the slip first.");
-        return;
-      }
-
-      document.getElementById('paymentStepSelect').classList.add('hidden');
-      document.getElementById('paymentStepTip').classList.remove('hidden');
-
-      document.getElementById('displayActiveCashier').innerText = selectedCashier;
-
-      const total = currentOrder.reduce((acc, i) => acc + (i.price * i.quantity), 0);
-      const changeBox = document.getElementById('tipScreenChangeBox');
-      const scanBlock = document.getElementById('scanTipCalculationBlock');
-      const cashDirectBlock = document.getElementById('cashTipDirectBlock');
-
-      if (selectedPayment === 'Cash') {
-        document.getElementById('tipScreenChangeAmount').innerText = `฿${changeDueAmount}`;
-        changeBox.classList.remove('hidden');
-        scanBlock.classList.add('hidden');
-        cashDirectBlock.classList.remove('hidden');
-        document.getElementById('inputTipAmount').value = '';
-      } else {
-        changeBox.classList.add('hidden');
-        scanBlock.classList.remove('hidden');
-        cashDirectBlock.classList.add('hidden');
-        document.getElementById('scanOrderTotalDisplay').innerText = `฿${total}`;
-        document.getElementById('inputScanPaidAmount').value = '';
-        document.getElementById('scanCalculatedTipDisplay').innerText = `฿0`;
-        document.getElementById('inputTipAmount').value = '';
-      }
-
-      document.getElementById('selectTipReceiver').value = "";
-      validateFinalPaymentButton();
-    }
-
-    function calculateScanTip() {
-      const total = currentOrder.reduce((acc, i) => acc + (i.price * i.quantity), 0);
-      const paidInput = document.getElementById('inputScanPaidAmount').value;
-      const paid = parseFloat(paidInput) || 0;
-      
-      let tip = 0;
-      if (paid >= total && total > 0) {
-        tip = paid - total;
-      }
-
-      document.getElementById('scanCalculatedTipDisplay').innerText = `฿${tip}`;
-      document.getElementById('inputTipAmount').value = tip;
-
-      const receiverSel = document.getElementById('selectTipReceiver');
-      if (tip === 0 && paidInput !== '') {
-        receiverSel.value = "No Tip";
-      } else if (tip > 0 && receiverSel.value === "No Tip") {
-        receiverSel.value = "";
-      }
-
-      validateFinalPaymentButton();
-    }
-
-    function onTipReceiverChanged() {
-      const receiver = document.getElementById('selectTipReceiver').value;
-      const total = currentOrder.reduce((acc, i) => acc + (i.price * i.quantity), 0);
-
-      if (receiver === 'No Tip') {
-        document.getElementById('inputTipAmount').value = 0;
-        if (selectedPayment === 'Scan') {
-          document.getElementById('inputScanPaidAmount').value = total;
-          document.getElementById('scanCalculatedTipDisplay').innerText = `฿0`;
-        }
-      }
-      validateFinalPaymentButton();
-    }
-
-    function backToPaymentSelect() {
-      document.getElementById('paymentStepTip').classList.add('hidden');
-      document.getElementById('paymentStepSelect').classList.remove('hidden');
-    }
-
-    function validateFinalPaymentButton() {
-      const sel = document.getElementById('selectTipReceiver').value;
-      const btn = document.getElementById('btnCompleteTransaction');
-      
-      let isValid = false;
-      if (sel && sel.trim() !== '') {
-        if (selectedPayment === 'Scan') {
-          const paid = parseFloat(document.getElementById('inputScanPaidAmount').value);
-          const total = currentOrder.reduce((acc, i) => acc + (i.price * i.quantity), 0);
-          if (!isNaN(paid) && paid >= total) {
-            isValid = true;
-          }
-        } else {
-          isValid = true;
-        }
-      }
-
-      if (isValid) {
-        btn.disabled = false;
-        btn.style.background = "#16a34a";
-        btn.style.color = "#ffffff";
-      } else {
-        btn.disabled = true;
-        btn.style.background = "#cbd5e1";
-        btn.style.color = "#64748b";
-      }
-    }
-
-    function submitTrainingTransaction() {
-      const orderId = `TR-${Date.now().toString().slice(-6)}`;
-      const payload = {
-        orderId: orderId,
-        tableNo: "Training",
-        customerName: "Staff Training",
-        guestCount: 1,
-        nationality: "Thai",
-        subtotal: 0,
-        discount: 0,
-        total: 0,
-        paymentMethod: "Training",
-        receivedCash: 0,
-        changeDue: 0,
-        tipAmount: 0,
-        tipReceiver: "No Tip",
-        slipImageBase64: null,
-        staffName: "Manager",
-        items: currentOrder.map(i => ({
-          name: i.name,
-          category: i.category,
-          price: 0,
-          quantity: i.quantity
-        }))
-      };
-
-      fetch(GAS_ENDPOINT, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      }).catch(err => console.error("Training sync error:", err));
-
-      delete tableSessions["Training"];
-      localStorage.setItem('NC_POS_SESSIONS', JSON.stringify(tableSessions));
-      currentOrder = [];
-      currentCustomer = "";
-
-      alert("Training order submitted! Stock data synced.");
-      renderOrder();
-      openSessionModal();
-    }
-
-    async function submitTransaction() {
-      const tipReceiver = document.getElementById('selectTipReceiver').value;
-      if (!tipReceiver) {
-        alert("Please select who received the tip.");
-        return;
-      }
-
-      const tipAmount = parseFloat(document.getElementById('inputTipAmount').value) || 0;
-      const btn = document.getElementById('btnCompleteTransaction');
-      btn.disabled = true;
-      btn.innerText = "Processing...";
-
-      const total = currentOrder.reduce((acc, i) => acc + (i.price * i.quantity), 0);
-      const orderId = `NC-${Date.now().toString().slice(-6)}`;
-      const sessionData = tableSessions[currentTable] || {};
-
-      const payload = {
-        orderId: orderId,
-        tableNo: currentTable,
-        customerName: currentCustomer,
-        guestCount: sessionData.guestCount || 1,
-        nationality: sessionData.nationality || "Thai",
-        subtotal: total,
-        discount: 0,
-        total: total,
-        paymentMethod: selectedPayment,
-        receivedCash: selectedPayment === 'Cash' ? receivedCashAmount : (parseFloat(document.getElementById('inputScanPaidAmount').value) || total),
-        changeDue: selectedPayment === 'Cash' ? changeDueAmount : 0,
-        tipAmount: tipAmount,
-        tipReceiver: tipReceiver,
-        slipImageBase64: selectedPayment === 'Scan' ? slipImageBase64 : null,
-        staffName: selectedCashier || sessionData.orderStaff || "Staff",
-        items: currentOrder.map(i => ({
-          name: i.name,
-          category: i.category,
-          price: i.price,
-          quantity: i.quantity
-        }))
-      };
-
-      fetch(GAS_ENDPOINT, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      }).catch(err => {
-        console.error("Background sync error:", err);
-      });
-
-      setTimeout(() => {
-        delete tableSessions[currentTable];
-        localStorage.setItem('NC_POS_SESSIONS', JSON.stringify(tableSessions));
-        currentOrder = [];
-        currentCustomer = "";
-
-        document.getElementById('paymentStepTip').classList.add('hidden');
-        document.getElementById('paymentSuccessContent').classList.remove('hidden');
-
-        setTimeout(() => {
-          closePaymentModal();
-          renderOrder();
-          openSessionModal();
-        }, 3000);
-      }, 1000);
-    }
-
-    openSessionModal();
-    renderMenu();
-  </script>
-</body>
-</html>
+      const total = currentOrder.reduce((acc, i)

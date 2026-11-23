@@ -2,2366 +2,1813 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>NC-POS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>NC-POS | TipsyCatCafe</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-    html {
+    * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+    html, body {
       width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
-    body {
-      width: 100%;
-      max-width: 100vw;
-      height: 100%;
-      height: 100dvh;
-      overflow: hidden;
-      background-color: #f1f5f9;
-      color: #1e293b;
-      user-select: none;
-      -webkit-user-select: none;
-      display: flex;
-      position: relative;
-    }
-    
-    button, input, select, .floor-item, .cat-btn, .menu-card, .active-session-badge {
+      max-width: 100%;
+      overflow-x: hidden;
+      overscroll-behavior-x: none;
       touch-action: manipulation;
-      cursor: pointer;
     }
-
-    /* 左側メインエリア */
-    .main-area {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      border-right: 2px solid #e2e8f0;
-      min-width: 0;
-      overflow-x: hidden;
-    }
-    .header-bar {
-      background: #ffffff;
-      padding: 10px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #e2e8f0;
-      flex-shrink: 0;
-    }
-    .brand-title {
-      font-size: 22px;
-      font-weight: 900;
-      color: #ea580c;
-      letter-spacing: 1px;
-    }
-    .active-session-badge {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: #fff7ed;
-      border: 1.5px solid #fed7aa;
-      padding: 6px 14px;
-      border-radius: 10px;
-    }
-    .badge-table {
-      font-weight: 900;
-      color: #ea580c;
-      font-size: 15px;
-    }
-    .badge-customer {
-      font-weight: 700;
-      color: #7c2d12;
-      font-size: 13px;
-      border-left: 1px solid #fdba74;
-      padding-left: 8px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 180px;
-    }
-    .clock-display {
-      font-size: 13px;
-      font-weight: 600;
-      color: #64748b;
-    }
-
-    /* 全体商品検索バー */
-    .search-bar-container {
-      background: #f8fafc;
-      padding: 8px 12px 4px 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-    .search-input-wrapper {
-      position: relative;
-      flex: 1;
-      display: flex;
-      align-items: center;
-    }
-    .menu-search-input {
-      width: 100%;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 10px;
-      padding: 9px 36px 9px 14px;
-      font-size: 15px;
-      font-weight: 600;
-      color: #1e293b;
-      background: #ffffff;
-      outline: none;
-      user-select: text !important;
-      -webkit-user-select: text !important;
-    }
-    .menu-search-input:focus {
-      border-color: #ea580c;
-    }
-    .btn-clear-search {
-      position: absolute;
-      right: 8px;
-      background: #e2e8f0;
-      color: #475569;
-      border: none;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      font-size: 14px;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .btn-clear-search:active {
-      background: #cbd5e1;
-    }
-
-    /* カテゴリタブ */
-    .cat-bar {
-      display: flex;
-      background: #e2e8f0;
-      padding: 8px 12px;
-      gap: 8px;
-      overflow-x: auto;
-      flex-shrink: 0;
-    }
-    .cat-btn {
-      border: none;
-      padding: 10px 18px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 700;
-      background: #ffffff;
-      color: #475569;
-      white-space: nowrap;
-    }
-    .cat-btn.active {
-      background: #ea580c;
-      color: #ffffff;
-    }
-
-    /* メニューグリッド */
-    .menu-container {
-      flex: 1;
-      padding: 14px;
-      overflow-y: auto;
-      overflow-x: hidden;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
-      gap: 12px;
-      align-content: start;
-    }
-    .menu-card {
-      background: #ffffff;
-      border: 1px solid #cbd5e1;
-      border-radius: 14px;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      height: 105px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-      text-align: left;
-    }
-    .menu-card:not(.menu-card-disabled):active {
-      transform: scale(0.96);
-      background: #fff7ed;
-      border-color: #ea580c;
-    }
-    .menu-card.menu-card-disabled {
-      background: #f1f5f9;
-      border-color: #e2e8f0;
-      opacity: 0.55;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-    .menu-card.menu-card-disabled .menu-name {
-      color: #64748b;
-    }
-    .menu-name {
-      font-size: 15px;
-      font-weight: 700;
-      color: #1e293b;
-      line-height: 1.25;
-    }
-    .menu-price {
-      font-size: 17px;
-      font-weight: 800;
-      color: #ea580c;
-    }
-
-    /* カートエリア */
-    .cart-area {
-      width: 350px;
-      background: #ffffff;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      box-shadow: -2px 0 6px rgba(0,0,0,0.04);
-      flex-shrink: 0;
-      transition: transform 0.25s ease-in-out;
-      z-index: 50;
-    }
-    .cart-header {
-      padding: 12px 16px;
-      background: #f8fafc;
-      border-bottom: 1px solid #e2e8f0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-shrink: 0;
-    }
-    .cart-title {
-      font-size: 17px;
-      font-weight: 800;
-      color: #334155;
-    }
-    .btn-clear {
-      background: none;
-      border: none;
-      color: #ef4444;
-      font-size: 13px;
-      font-weight: 700;
-    }
-    .btn-close-sp-cart {
-      display: none;
-      background: none;
-      border: none;
-      font-size: 24px;
-      color: #64748b;
-    }
-
-    .cart-items {
-      flex: 1;
-      overflow-y: auto;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .cart-item-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #f8fafc;
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid #e2e8f0;
-    }
-    .cart-item-row.is-confirmed {
-      background: #f1f5f9;
-      border-left: 4px solid #10b981;
-    }
-    .item-info-name {
-      font-size: 14px;
-      font-weight: 700;
-      color: #1e293b;
-    }
-    .item-info-calc {
-      font-size: 12px;
-      color: #64748b;
-      margin-top: 2px;
-    }
-    .qty-controls {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn-qty {
-      width: 28px;
-      height: 28px;
-      background: #ffffff;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      font-size: 16px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .btn-qty:active { background: #e2e8f0; }
-    .qty-display {
-      font-size: 15px;
-      font-weight: 700;
-      min-width: 20px;
-      text-align: center;
-    }
-
-    .btn-item-cancel {
-      background: #fee2e2;
-      color: #ef4444;
-      border: 1px solid #fca5a5;
-      padding: 6px 10px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 800;
-    }
-    .btn-item-cancel:active {
-      background: #ef4444;
-      color: #ffffff;
-    }
-
-    .cart-footer {
-      padding: 14px 16px;
-      padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
-      background: #f8fafc;
-      border-top: 1px solid #e2e8f0;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-    .sum-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 14px;
-      font-weight: 600;
-      color: #64748b;
-    }
-    .total-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 22px;
-      font-weight: 900;
-      color: #0f172a;
-      border-top: 1px dashed #cbd5e1;
-      padding-top: 6px;
-    }
-
-    .btn-action-order, .btn-action-pay {
-      flex: 1;
-      padding: 14px 6px;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 800;
-      border: none;
-      text-align: center;
-      transition: background 0.15s, opacity 0.15s;
-    }
-    .btn-action-order {
-      background: #2563eb;
-      color: #ffffff;
-      box-shadow: 0 3px 5px rgba(37, 99, 235, 0.25);
-    }
-    .btn-action-pay {
-      background: #ea580c;
-      color: #ffffff;
-      box-shadow: 0 3px 5px rgba(234, 88, 12, 0.25);
-    }
-    .btn-action-order:disabled, .btn-action-pay:disabled {
-      background: #cbd5e1 !important;
-      color: #94a3b8 !important;
-      box-shadow: none !important;
-      cursor: not-allowed;
-    }
-
-    /* スマホ専用フローティングボタン */
-    .sp-cart-floating-btn {
-      display: none;
-      position: fixed;
-      bottom: 14px;
-      left: 14px;
-      right: 14px;
-      background: #ea580c;
-      color: #ffffff;
-      padding: 14px 20px;
-      border-radius: 14px;
-      box-shadow: 0 10px 20px -3px rgba(234, 88, 12, 0.4);
-      justify-content: space-between;
-      align-items: center;
-      font-size: 16px;
-      font-weight: 800;
-      z-index: 40;
-    }
-
-    /* モーダル枠 */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(15, 23, 42, 0.75);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 12px;
-      z-index: 999;
-    }
-    .modal-card {
-      background: #ffffff;
-      border-radius: 20px;
-      width: 100%;
-      max-width: 500px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-      max-height: 92dvh;
-      overflow-y: auto;
-      overflow-x: hidden;
-      position: relative;
-      z-index: 1000;
-    }
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #e2e8f0;
-      padding-bottom: 8px;
-    }
-
-    /* フロアマップ領域 */
-    .floor-canvas-container {
-      position: relative;
-      width: 100%;
-      height: 270px;
-      background: #f8fafc;
-      border: 2px dashed #cbd5e1;
-      border-radius: 14px;
-      overflow: hidden;
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .seat-node {
       touch-action: none;
+      user-select: none;
+      transition: transform 0.1s ease, box-shadow 0.15s ease;
     }
-    .floor-canvas-container.editing {
-      border: 2px solid #ea580c;
-      background: #fffbeb;
-    }
-
-    /* フロアアイテム基本 */
-    .floor-item {
-      position: absolute;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.06);
-      transition: width 0.15s, height 0.15s, font-size 0.15s;
-    }
-    .floor-item.bar-seat {
-      background: #ffffff;
-      border: 2px solid #94a3b8;
-      color: #334155;
-      border-radius: 50%;
-    }
-    .floor-item.table-seat {
-      background: #ffffff;
-      border: 2px solid #3b82f6;
-      color: #1e3a8a;
-      border-radius: 10px;
-    }
-    .floor-item.selected {
-      border-color: #ea580c !important;
-      background: #ea580c !important;
-      color: #ffffff !important;
-      transform: scale(1.05);
-      box-shadow: 0 6px 12px rgba(234, 88, 12, 0.3);
-      z-index: 15;
-    }
-    .floor-item.dragging {
-      opacity: 0.8;
-      transform: scale(1.1);
-      z-index: 99;
-    }
-    .floor-item.occupied {
-      background: #fee2e2 !important;
-      border-color: #ef4444 !important;
-      color: #991b1b !important;
-    }
-    
-    /* ツールバー */
-    .edit-toolbar {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn-edit-mode {
-      background: #f1f5f9;
-      border: 1.5px solid #cbd5e1;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 800;
-      color: #334155;
-    }
-    .btn-edit-mode.active {
-      background: #ea580c !important;
-      color: #ffffff !important;
-      border-color: #ea580c !important;
-    }
-
-    .btn-delete-table-info {
-      background: #fff1f2;
-      border: 1.5px solid #fecdd3;
-      padding: 6px 10px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 800;
-      color: #e11d48;
-    }
-
-    .btn-training-lock {
-      background: #f1f5f9;
-      border: 1.5px solid #cbd5e1;
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      color: #475569;
-    }
-    .btn-training-lock:active {
-      background: #e2e8f0;
-      transform: scale(0.95);
-    }
-
-    /* 5段階サイズセレクタ */
-    .size-btn-group {
-      display: flex;
-      gap: 3px;
-      align-items: center;
-      background: #e2e8f0;
-      padding: 3px;
-      border-radius: 8px;
-    }
-    .btn-size-choice {
-      border: none;
-      background: transparent;
-      padding: 3px 6px;
-      font-size: 11px;
-      font-weight: 800;
-      border-radius: 6px;
-      color: #475569;
-    }
-    .btn-size-choice.active {
-      background: #ea580c;
-      color: #ffffff;
-    }
-
-    .input-customer {
-      width: 100%;
-      border: 2px solid #cbd5e1;
-      border-radius: 12px;
-      padding: 10px 14px;
-      font-size: 14px;
-      font-weight: 600;
-      color: #1e293b;
-      outline: none;
-      user-select: text !important;
-      -webkit-user-select: text !important;
-    }
-    .input-customer:focus {
-      border-color: #ea580c;
-      background: #fff;
-    }
-    .btn-start-order {
-      width: 100%;
-      background: #ea580c;
-      color: #ffffff;
-      border: none;
-      padding: 14px;
-      border-radius: 12px;
-      font-size: 17px;
-      font-weight: 800;
-    }
-
-    .nat-btn {
-      flex: 1;
-      padding: 8px 4px;
-      background: #f8fafc;
-      border: 2px solid #cbd5e1;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 800;
-      color: #475569;
-      text-align: center;
-    }
-    .nat-btn.selected {
-      border-color: #ea580c !important;
-      background: #fff7ed !important;
-      color: #ea580c !important;
-    }
-
-    .btn-close-modal {
-      background: none;
-      border: none;
-      font-size: 26px;
-      color: #94a3b8;
-    }
-    .pay-methods {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    .btn-pay-method {
-      border: 2px solid #cbd5e1;
-      background: #ffffff;
-      padding: 14px;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 700;
-      color: #334155;
-    }
-    .btn-pay-method.selected {
-      border-color: #ea580c;
-      background: #fff7ed;
-      color: #ea580c;
-    }
-    .btn-pay-method:disabled {
-      background: #f1f5f9 !important;
-      border-color: #e2e8f0 !important;
-      color: #94a3b8 !important;
-      cursor: not-allowed !important;
-    }
-    .hidden { display: none !important; }
-
-    /* スマホ縦画面レスポンシブスタイル */
+    .seat-node:active { transform: scale(0.96); }
     @media (max-width: 768px) {
-      body {
-        flex-direction: column;
-      }
-      .main-area {
-        width: 100%;
-        border-right: none;
-      }
-      .header-bar {
-        padding: 8px 12px;
-      }
-      .brand-title {
-        font-size: 18px;
-      }
-      .active-session-badge {
-        padding: 4px 10px;
-      }
-      .badge-table {
-        font-size: 13px;
-      }
-      .badge-customer {
-        font-size: 12px;
-        max-width: 110px;
-      }
-      .clock-display {
-        font-size: 11px;
-      }
-      .menu-container {
-        padding-bottom: 80px;
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-        gap: 8px;
-      }
-      .menu-card {
-        height: 90px;
-        padding: 10px;
-      }
-      .menu-name {
-        font-size: 13px;
-      }
-      .menu-price {
-        font-size: 15px;
-      }
-      .cart-area {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 80vh;
-        border-radius: 20px 20px 0 0;
-        box-shadow: 0 -10px 25px rgba(0,0,0,0.2);
-        transform: translateY(100%);
-      }
-      .cart-area.sp-open {
-        transform: translateY(0);
-      }
-      .btn-close-sp-cart {
-        display: block;
-      }
-      .sp-cart-floating-btn {
-        display: flex;
-      }
-      .modal-card {
-        padding: 14px;
-        max-height: 95dvh;
-      }
-      .floor-canvas-container {
-        height: 230px;
+      #mobileCartSheet {
+        transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
       }
     }
   </style>
 </head>
-<body>
+<body class="bg-slate-100 text-slate-800 font-sans h-screen flex flex-col overflow-hidden select-none">
 
-  <!-- ==================== 初期テーブル＆名前入力モーダル ==================== -->
-  <div id="sessionModal" class="modal-overlay">
-    <div class="modal-card">
-      <div class="modal-header">
-        <div>
-          <h3 style="font-size: 16px; font-weight: 900; color: #0f172a;">Floor Map & Table</h3>
-          <p style="font-size: 11px; color: #64748b; font-weight: 600;">Tap seat to select</p>
+  <!-- ==========================================
+       TOP HEADER BAR
+       ========================================== -->
+  <header class="bg-slate-900 text-white px-3 sm:px-5 py-2.5 flex items-center justify-between shadow-md shrink-0 z-20">
+    <div class="flex items-center space-x-2 sm:space-x-3 min-w-0">
+      <button onclick="openFloorModal()" class="bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-slate-950 font-black px-3 py-1.5 rounded-lg text-xs sm:text-sm flex items-center space-x-1.5 shadow shrink-0">
+        <span>🗺 Floor</span>
+      </button>
+      <div class="truncate">
+        <div id="headerSessionTitle" class="font-black text-sm sm:text-base tracking-wide text-amber-400 truncate">
+          NC-POS | Select Table
         </div>
-        <div class="edit-toolbar">
-          <button type="button" onclick="confirmDeleteTableInfoModal()" class="btn-delete-table-info">
-            🗑 Delete
-          </button>
-          <button type="button" id="btnToggleEdit" onclick="toggleEditMode()" class="btn-edit-mode">
+        <div id="headerSessionSub" class="text-[11px] text-slate-300 truncate">
+          Tap Floor to start session
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center space-x-2 sm:space-x-3 shrink-0">
+      <button onclick="syncMasterData(true)" id="syncStatusBadge" class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-emerald-400 flex items-center space-x-1">
+        <span id="syncDot" class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
+        <span id="syncText">Syncing...</span>
+      </button>
+      <div id="clockDisplay" class="hidden sm:block text-xs font-mono text-slate-300">00:00</div>
+    </div>
+  </header>
+
+  <!-- ==========================================
+       MAIN WORKSPACE (MENU + DESKTOP CART)
+       ========================================== -->
+  <main class="flex-1 flex overflow-hidden relative w-full max-w-full">
+
+    <!-- LEFT: SEARCH + CATEGORY TABS + MENU GRID -->
+    <section class="flex-1 flex flex-col h-full overflow-hidden min-w-0">
+
+      <!-- Global Search Bar -->
+      <div class="bg-white px-3 pt-2.5 pb-2 border-b border-slate-200 shrink-0">
+        <div class="relative flex items-center">
+          <span class="absolute left-3 text-slate-400 text-sm">🔍</span>
+          <input
+            type="text"
+            id="menuSearchInput"
+            oninput="handleSearchInput()"
+            placeholder="Search menu (English / 日本語)..."
+            class="w-full bg-slate-100 border border-slate-300 rounded-xl pl-9 pr-9 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white select-text"
+          >
+          <button
+            id="clearSearchBtn"
+            onclick="clearSearchInput()"
+            class="hidden absolute right-2.5 w-6 h-6 rounded-full bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold text-xs flex items-center justify-center"
+            aria-label="Clear search"
+          >&times;</button>
+        </div>
+      </div>
+
+      <!-- Dynamic Category Tabs -->
+      <div id="categoryTabsContainer" class="bg-slate-200/80 px-3 py-2 flex space-x-2 overflow-x-auto no-scrollbar shrink-0 border-b border-slate-300">
+        <button class="cat-tab bg-amber-500 text-slate-950 font-black px-3.5 py-1.5 rounded-lg text-xs sm:text-sm whitespace-nowrap shadow-sm" onclick="selectCategory('ALL')">ALL</button>
+      </div>
+
+      <!-- Menu Cards Grid -->
+      <div id="menuGridContainer" class="flex-1 overflow-y-auto p-3 sm:p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3 content-start pb-24 md:pb-4">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- RIGHT: DESKTOP ORDER CART SIDEBAR (md and up) -->
+    <aside class="hidden md:flex w-96 bg-white border-l border-slate-300 flex-col h-full shadow-lg shrink-0">
+      <div id="desktopCartMount" class="flex-1 flex flex-col h-full overflow-hidden"></div>
+    </aside>
+
+    <!-- MOBILE FLOATING CART BAR (< md) -->
+    <div id="mobileFloatingBar" class="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900 text-white px-4 py-3 flex items-center justify-between shadow-2xl border-t border-slate-700 z-30">
+      <div onclick="openMobileCartSheet()" class="flex-1 flex items-center space-x-3 cursor-pointer min-w-0">
+        <div class="bg-amber-500 text-slate-950 font-black px-2.5 py-1 rounded-lg text-xs shrink-0">
+          <span id="mobileBarCount">0</span> items
+        </div>
+        <div class="truncate">
+          <div class="text-[11px] text-slate-400">Net Total</div>
+          <div id="mobileBarTotal" class="text-lg font-black text-amber-400 leading-tight">฿0</div>
+        </div>
+      </div>
+      <button onclick="openMobileCartSheet()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-4 py-2.5 rounded-xl text-sm shadow shrink-0">
+        View Cart ▲
+      </button>
+    </div>
+
+    <!-- MOBILE SLIDE-UP CART SHEET (< md) -->
+    <div id="mobileCartBackdrop" onclick="closeMobileCartSheet()" class="md:hidden hidden fixed inset-0 bg-black/50 z-40"></div>
+    <div id="mobileCartSheet" class="md:hidden fixed inset-x-0 bottom-0 h-[85vh] bg-white rounded-t-2xl shadow-2xl z-50 flex flex-col transform translate-y-full">
+      <div class="w-12 h-1.5 bg-slate-300 rounded-full mx-auto my-2 shrink-0"></div>
+      <div id="mobileCartMount" class="flex-1 flex flex-col overflow-hidden"></div>
+    </div>
+
+  </main>
+
+  <!-- ==========================================
+       MODAL 1: FLOOR MAP & SESSION SETUP MODAL
+       ========================================== -->
+  <div id="floorModal" class="fixed inset-0 bg-slate-950/75 flex items-center justify-center p-2 sm:p-4 z-50">
+    <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[95vh] flex flex-col shadow-2xl overflow-hidden">
+
+      <!-- Modal Header -->
+      <div class="bg-slate-900 text-white px-4 py-3 flex items-center justify-between shrink-0">
+        <div class="flex items-center space-x-2">
+          <span class="text-lg font-black text-amber-400">TipsyCatCafe</span>
+          <span class="text-xs text-slate-400 font-semibold hidden sm:inline">Floor Map & Session</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="toggleEditMode()" id="btnToggleEdit" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-600">
             ⚙ Edit
           </button>
-          <button type="button" onclick="openPinModal()" class="btn-training-lock" title="Staff Training">
+          <button onclick="openPinModal()" title="Admin / Training Mode" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-amber-400 flex items-center justify-center text-sm">
             🔒
           </button>
         </div>
       </div>
 
-      <!-- フロアマップ領域 -->
-      <div id="floorCanvas" class="floor-canvas-container"></div>
-
-      <!-- 編集モードツールボタン -->
-      <div id="editToolsBlock" class="hidden" style="display: flex; flex-direction: column; gap: 8px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border: 1.5px solid #cbd5e1; padding: 6px 10px; border-radius: 10px;">
-          <span style="font-size: 12px; font-weight: 800; color: #475569;">Icon Size:</span>
-          <div class="size-btn-group">
-            <button type="button" onclick="changeSeatScale(1)" id="btnSize-1" class="btn-size-choice">XS</button>
-            <button type="button" onclick="changeSeatScale(2)" id="btnSize-2" class="btn-size-choice">S</button>
-            <button type="button" onclick="changeSeatScale(3)" id="btnSize-3" class="btn-size-choice">M</button>
-            <button type="button" onclick="changeSeatScale(4)" id="btnSize-4" class="btn-size-choice">L</button>
-            <button type="button" onclick="changeSeatScale(5)" id="btnSize-5" class="btn-size-choice">XL</button>
-          </div>
+      <!-- Edit Mode Toolbar (Hidden by default) -->
+      <div id="editToolbar" class="hidden bg-amber-50 border-b border-amber-200 px-3 py-2 flex flex-wrap items-center justify-between gap-2 shrink-0">
+        <div class="flex flex-wrap items-center gap-1.5">
+          <button onclick="addSeat('bar')" class="bg-white border border-slate-300 hover:bg-slate-50 text-xs font-bold px-2.5 py-1 rounded-lg">+ Add Bar</button>
+          <button onclick="addSeat('table')" class="bg-white border border-slate-300 hover:bg-slate-50 text-xs font-bold px-2.5 py-1 rounded-lg">+ Add Table</button>
+          <button onclick="resetSeatsLayout()" class="bg-white border border-red-200 text-red-600 hover:bg-red-50 text-xs font-bold px-2.5 py-1 rounded-lg">Reset</button>
         </div>
-
-        <div style="display: flex; gap: 6px;">
-          <button type="button" onclick="addNewSeat('Bar')" style="flex: 1; background: #f8fafc; border: 1.5px solid #cbd5e1; padding: 8px; border-radius: 8px; font-weight: 800; font-size: 12px;">+ Add Bar</button>
-          <button type="button" onclick="addNewSeat('Table')" style="flex: 1; background: #f8fafc; border: 1.5px solid #cbd5e1; padding: 8px; border-radius: 8px; font-weight: 800; font-size: 12px;">+ Add Table</button>
-          <button type="button" onclick="resetDefaultLayout()" style="background: #fee2e2; border: 1px solid #f87171; color: #b91c1c; padding: 8px 10px; border-radius: 8px; font-weight: 800; font-size: 12px;">Reset</button>
+        <div class="flex items-center space-x-1">
+          <span class="text-[11px] font-bold text-slate-500 mr-1">Size:</span>
+          <button onclick="setSeatSize('XS')" data-size="XS" class="size-btn px-2 py-0.5 text-xs font-bold rounded border">XS</button>
+          <button onclick="setSeatSize('S')" data-size="S" class="size-btn px-2 py-0.5 text-xs font-bold rounded border">S</button>
+          <button onclick="setSeatSize('M')" data-size="M" class="size-btn px-2 py-0.5 text-xs font-bold rounded border">M</button>
+          <button onclick="setSeatSize('L')" data-size="L" class="size-btn px-2 py-0.5 text-xs font-bold rounded border">L</button>
+          <button onclick="setSeatSize('XL')" data-size="XL" class="size-btn px-2 py-0.5 text-xs font-bold rounded border">XL</button>
         </div>
       </div>
 
-      <!-- 受付スタッフ（Server）選択プルダウン -->
-      <div>
-        <label style="display: block; font-size: 12px; font-weight: 800; color: #1e293b; margin-bottom: 4px;">
-          Server / Staff <span style="color: #ef4444;">*</span>
-        </label>
-        <select id="selectOrderStaff" onchange="checkStartOrderValidation()" style="width: 100%; border: 2px solid #cbd5e1; border-radius: 10px; padding: 10px 12px; font-size: 14px; font-weight: 800; color: #1e293b; background: #fff; outline: none;">
-        </select>
-      </div>
+      <!-- Modal Body: Canvas + Session Form -->
+      <div class="flex-1 overflow-y-auto flex flex-col md:flex-row">
 
-      <!-- 客名入力 -->
-      <div>
-        <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 4px;">Customer / Guest Name</label>
-        <input type="text" id="inputCustomerName" class="input-customer" placeholder="Enter guest name or note..." autocomplete="off">
-      </div>
-
-      <!-- 人数 & 国籍選択 -->
-      <div style="display: flex; gap: 8px;">
-        <div style="flex: 1;">
-          <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 4px;">
-            Guests <span style="color: #ef4444;">*</span>
-          </label>
-          <div style="display: flex; align-items: center; gap: 4px;">
-            <button type="button" onclick="changeGuestCount(-1)" class="btn-qty" style="width: 32px; height: 32px; font-size: 16px;">-</button>
-            <input type="number" id="inputGuestCount" min="1" max="20" value="1" readonly style="width: 100%; text-align: center; font-size: 15px; font-weight: 800; border: 2px solid #cbd5e1; border-radius: 8px; height: 32px; background: #fff;">
-            <button type="button" onclick="changeGuestCount(1)" class="btn-qty" style="width: 32px; height: 32px; font-size: 16px;">+</button>
-          </div>
-        </div>
-
-        <div style="flex: 2;">
-          <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 4px;">
-            Nationality <span style="color: #ef4444;">*</span>
-          </label>
-          <div style="display: flex; gap: 4px;">
-            <button type="button" onclick="selectNationality('Thai')" id="nat-Thai" class="nat-btn">Thai</button>
-            <button type="button" onclick="selectNationality('Asia')" id="nat-Asia" class="nat-btn">Asia</button>
-            <button type="button" onclick="selectNationality('Foreigner')" id="nat-Foreigner" class="nat-btn">Foreigner</button>
-          </div>
-        </div>
-      </div>
-
-      <button type="button" onclick="confirmTableAndGuest()" class="btn-start-order">
-        Start Order ➔
-      </button>
-    </div>
-  </div>
-
-  <!-- ==================== 管理者PIN入力モーダル ==================== -->
-  <div id="pinModal" class="modal-overlay hidden">
-    <div class="modal-card" style="max-width: 340px; text-align: center;">
-      <h3 style="font-size: 18px; font-weight: 900; color: #0f172a;">Manager PIN Required</h3>
-      <p style="font-size: 12px; font-weight: 700; color: #64748b;">Enter PIN to unlock Training Mode</p>
-      
-      <input type="password" id="inputManagerPin" maxlength="4" pattern="[0-9]*" inputmode="numeric" placeholder="****" style="width: 100%; text-align: center; font-size: 28px; letter-spacing: 12px; font-weight: 900; padding: 12px; border: 2px solid #cbd5e1; border-radius: 12px; outline: none; margin: 10px 0; user-select: text !important; -webkit-user-select: text !important;">
-      
-      <div style="display: flex; gap: 8px;">
-        <button type="button" onclick="closePinModal()" style="flex: 1; background: #e2e8f0; color: #475569; border: none; padding: 12px; border-radius: 10px; font-weight: 800;">Cancel</button>
-        <button type="button" onclick="verifyManagerPin()" style="flex: 1.2; background: #ea580c; color: #ffffff; border: none; padding: 12px; border-radius: 10px; font-weight: 800;">Unlock</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== メイン画面 ==================== -->
-  <div class="main-area">
-    <div class="header-bar">
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <span class="brand-title">NC-POS</span>
-        <div class="active-session-badge" onclick="openSessionModal()" title="Tap to change table/guest">
-          <span class="badge-table" id="headerTable">Bar-1</span>
-          <span class="badge-customer" id="headerCustomer">Guest</span>
-        </div>
-      </div>
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <span id="syncStatus" style="font-size: 11px; font-weight: 700; color: #16a34a;">● Live</span>
-        <div class="clock-display" id="clock">00:00:00</div>
-      </div>
-    </div>
-
-    <!-- 全体商品検索バー（カテゴリータブの上部） -->
-    <div class="search-bar-container">
-      <div class="search-input-wrapper">
-        <input type="text" id="menuSearchInput" class="menu-search-input" placeholder="🔍 Search all items..." oninput="handleMenuSearch()" autocomplete="off">
-        <button type="button" id="btnClearSearch" class="btn-clear-search hidden" onclick="clearMenuSearch()">&times;</button>
-      </div>
-    </div>
-
-    <!-- Category Tabs -->
-    <div class="cat-bar" id="categoryTabs">
-      <button type="button" class="cat-btn active" onclick="filterCategory('All', this)">ALL</button>
-    </div>
-
-    <!-- Menu Grid -->
-    <div class="menu-container" id="menuGrid"></div>
-  </div>
-
-  <!-- スマホ用フローティングカートバー -->
-  <div class="sp-cart-floating-btn" id="spCartBar" onclick="toggleSpCart(true)">
-    <span>🛒 View Order (<span id="spCartCount">0</span>)</span>
-    <span id="spCartTotal">฿0</span>
-  </div>
-
-  <!-- Cart / Sidebar -->
-  <div class="cart-area" id="cartSidebar">
-    <div class="cart-header">
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <button type="button" onclick="toggleSpCart(false)" class="btn-close-sp-cart">&times;</button>
-        <span class="cart-title">Order Details</span>
-      </div>
-      <button type="button" onclick="clearCurrentOrder()" class="btn-clear">Clear All</button>
-    </div>
-
-    <div class="cart-items" id="orderItemsContainer">
-      <p style="text-align: center; color: #94a3b8; margin-top: 30px; font-weight: 600; font-size: 14px;">Select items from menu</p>
-    </div>
-
-    <div class="cart-footer">
-      <div class="sum-row">
-        <span>Subtotal</span>
-        <span id="subtotalDisplay">฿0</span>
-      </div>
-      <div class="total-row">
-        <span>Total</span>
-        <span id="totalDisplay" style="color: #ea580c;">฿0</span>
-      </div>
-
-      <div style="display: flex; gap: 8px; margin-top: 4px;">
-        <button type="button" onclick="confirmCurrentOrderOnly()" id="btnSendOrder" class="btn-action-order" disabled>
-          Order
-        </button>
-        <button type="button" onclick="openPaymentModal()" id="btnCheckout" class="btn-action-pay" disabled>
-          Proceed to Payment
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== 注文確認モーダル ==================== -->
-  <div id="orderConfirmModal" class="modal-overlay hidden">
-    <div class="modal-card" style="max-width: 440px;" id="orderConfirmModalCard">
-      <div id="orderConfirmContent">
-        <div class="modal-header">
-          <h3 style="font-size: 18px; font-weight: 800;">Confirm Order?</h3>
-          <button type="button" onclick="closeOrderConfirmModal()" class="btn-close-modal">&times;</button>
-        </div>
-
-        <div style="font-size: 13px; font-weight: 700; color: #64748b; margin-top: 6px;">
-          <span id="confirmModalTable" style="color: #ea580c;"></span> | <span id="confirmModalCustomer"></span>
-          <span style="display:block; font-size:11px; color:#2563eb; font-weight:800; margin-top:2px;">※ Items in this order batch</span>
-        </div>
-
-        <div id="confirmOrderItemsList" style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px; background: #f8fafc; margin-top: 8px;"></div>
-
-        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed #cbd5e1; padding-top: 10px; margin-top: 8px; font-size: 18px; font-weight: 900;">
-          <span>This Order Total</span>
-          <span id="confirmModalTotal" style="color: #ea580c;">฿0</span>
-        </div>
-
-        <div style="display: flex; gap: 10px; margin-top: 12px;">
-          <button type="button" onclick="closeOrderConfirmModal()" style="flex: 1; background: #e2e8f0; color: #475569; border: none; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 800;">
-            Back
-          </button>
-          <button type="button" onclick="executeFinalOrder()" style="flex: 1.2; background: #2563eb; color: #ffffff; border: none; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 800; box-shadow: 0 3px 5px rgba(37,99,235,0.25);">
-            Confirm Order
-          </button>
-        </div>
-      </div>
-
-      <div id="orderSuccessContent" class="hidden" style="text-align: center; padding: 24px 10px;">
-        <div style="font-size: 50px; margin-bottom: 12px;">✅</div>
-        <h3 style="font-size: 22px; font-weight: 900; color: #16a34a; margin-bottom: 8px;">Order Confirmed!</h3>
-        <p style="font-size: 14px; font-weight: 700; color: #64748b;">Returning to Floor Map in 3 seconds...</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== テーブル情報削除 確認モーダル ==================== -->
-  <div id="deleteTableInfoModal" class="modal-overlay hidden">
-    <div class="modal-card" style="max-width: 440px;">
-      <div id="deleteTableInfoContent">
-        <div class="modal-header">
-          <h3 style="font-size: 18px; font-weight: 800; color: #e11d48;">Delete This Table Info?</h3>
-          <button type="button" onclick="closeDeleteTableInfoModal()" class="btn-close-modal">&times;</button>
-        </div>
-
-        <div style="font-size: 14px; font-weight: 700; color: #334155; margin-top: 8px;">
-          Table: <span id="delModalTable" style="color: #ea580c; font-weight: 900;"></span> 
-          (<span id="delModalCustomer"></span>)
-        </div>
-
-        <div style="font-size: 12px; font-weight: 700; color: #64748b; margin-top: 6px;">
-          Current active orders in this table:
-        </div>
-
-        <div id="delModalItemsList" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; border: 1px solid #fed7aa; border-radius: 10px; padding: 10px; background: #fff7ed; margin-top: 6px;"></div>
-
-        <p style="font-size: 12px; color: #e11d48; font-weight: 800; margin-top: 8px;">
-          * Deleting will completely clear all orders and reset this seat to available.
-        </p>
-
-        <div style="display: flex; gap: 10px; margin-top: 12px;">
-          <button type="button" onclick="closeDeleteTableInfoModal()" style="flex: 1; background: #e2e8f0; color: #475569; border: none; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 800;">
-            Back
-          </button>
-          <button type="button" onclick="executeDeleteTableInfo()" style="flex: 1.2; background: #e11d48; color: #ffffff; border: none; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 800;">
-            Confirm Delete
-          </button>
-        </div>
-      </div>
-
-      <div id="deleteSuccessContent" class="hidden" style="text-align: center; padding: 24px 10px;">
-        <div style="font-size: 50px; margin-bottom: 12px;">🗑️</div>
-        <h3 style="font-size: 22px; font-weight: 900; color: #e11d48; margin-bottom: 8px;">Table Reset Completed</h3>
-        <p style="font-size: 14px; font-weight: 700; color: #64748b;">Returning to Floor Map in 3 seconds...</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== 支払いモーダル ==================== -->
-  <div id="paymentModal" class="modal-overlay hidden">
-    <div class="modal-card" style="max-width: 480px;">
-      
-      <div id="paymentStepSelect">
-        <div class="modal-header">
-          <h3 style="font-size: 18px; font-weight: 800;">Payment Checkout</h3>
-          <button type="button" onclick="closePaymentModal()" class="btn-close-modal">&times;</button>
-        </div>
-
-        <div style="text-align: center; margin-top: 4px;">
-          <div style="font-size: 13px; font-weight: 700; color: #64748b;">Total Due</div>
-          <div style="font-size: 32px; font-weight: 900; color: #ea580c;" id="modalTotalDisplay">฿0</div>
-        </div>
-
-        <div style="margin-top: 10px;">
-          <label style="display: block; font-size: 13px; font-weight: 800; color: #1e293b; margin-bottom: 4px;">
-            Cashier <span style="color: #ef4444;">*</span>
-          </label>
-          <select id="selectCashier" onchange="onCashierChanged()" style="width: 100%; border: 2px solid #cbd5e1; border-radius: 10px; padding: 12px; font-size: 16px; font-weight: 800; color: #1e293b; background: #fff; outline: none;">
-          </select>
-        </div>
-
-        <div style="margin-top: 12px;">
-          <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 6px;">Payment Method</label>
-          <div class="pay-methods">
-            <button type="button" onclick="selectMethod('Cash')" id="btnMethodCash" class="btn-pay-method" disabled>Cash</button>
-            <button type="button" onclick="selectMethod('Scan')" id="btnMethodPP" class="btn-pay-method" disabled>Scan</button>
-          </div>
-        </div>
-
-        <div id="cashArea" class="hidden" style="border-top: 1px solid #e2e8f0; padding-top: 14px; margin-top: 12px; display: flex; flex-direction: column; gap: 12px;">
-          <div>
-            <label style="display: block; font-size: 13px; font-weight: 800; color: #475569; margin-bottom: 6px;">Received Amount (฿) <span style="color: #ef4444;">*</span></label>
-            <input type="number" id="inputReceivedCash" oninput="checkCashReceivedInput()" placeholder="0" style="width: 100%; border: 2px solid #cbd5e1; border-radius: 12px; padding: 14px; font-size: 22px; font-weight: 800; color: #1e293b; outline: none; user-select: text !important; -webkit-user-select: text !important;">
-          </div>
-          <button type="button" id="btnProceedCashTip" onclick="proceedToTipScreen()" style="width: 100%; background: #cbd5e1; color: #64748b; border: none; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: 800;" disabled>
-            Next: Change & Tip ➔
-          </button>
-        </div>
-
-        <div id="promptPayArea" class="hidden" style="border-top: 1px solid #e2e8f0; padding-top: 14px; margin-top: 12px; display: flex; flex-direction: column; gap: 12px;">
-          <div style="text-align: center;">
-            <p style="font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 6px;">Present QR to Customer</p>
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=PROMPTPAY_SAMPLE" style="width: 140px; height: 140px; border: 2px solid #e2e8f0; border-radius: 12px;" alt="Scan QR">
-          </div>
-
-          <div style="text-align: center;">
-            <input type="file" accept="image/*" capture="environment" id="cameraInput" style="display: none;" onchange="handleSlipCapture(event)">
-            
-            <div id="cameraActionBlock">
-              <button type="button" onclick="document.getElementById('cameraInput').click()" style="background: #2563eb; color: #ffffff; border: none; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 700;">
-                📷 Take Photo of Slip
-              </button>
-            </div>
-
-            <div id="slipPreviewBlock" class="hidden" style="margin-top: 8px; display: flex; flex-direction: column; gap: 8px;">
-              <div style="border: 2px solid #e2e8f0; border-radius: 10px; padding: 4px; max-height: 150px; overflow: hidden; background: #f8fafc;">
-                <img id="slipPreviewImg" style="max-height: 140px; max-width: 100%; object-fit: contain; border-radius: 6px;" alt="Preview">
-              </div>
-              <div style="display: flex; gap: 8px;">
-                <button type="button" onclick="document.getElementById('cameraInput').click()" style="flex: 1; background: #e2e8f0; border: none; padding: 10px; border-radius: 8px; font-weight: 700; font-size: 13px;">Retake</button>
-                <button type="button" onclick="confirmSlipPhoto()" id="btnConfirmSlip" style="flex: 1; background: #16a34a; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; font-size: 13px;">Confirm OK</button>
-              </div>
-            </div>
-          </div>
-
-          <div style="border-top: 1px solid #e2e8f0; padding-top: 10px;">
-            <button type="button" id="btnProceedScanTip" onclick="proceedToTipScreen()" style="width: 100%; background: #cbd5e1; color: #64748b; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 800;" disabled>
-              Proceed to Tip ➔
+        <!-- Floor Map Canvas -->
+        <div class="p-3 sm:p-4 flex-1 flex flex-col bg-slate-100 border-b md:border-b-0 md:border-r border-slate-200">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-slate-500" id="floorGuideText">Tap a seat to select or resume</span>
+            <button id="btnDeleteSeatSession" onclick="confirmDeleteSeatSession()" class="hidden text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-2.5 py-1 rounded-lg">
+              🗑 Delete
             </button>
           </div>
-        </div>
-      </div>
-
-      <!-- ステップ2: Tip入力画面 -->
-      <div id="paymentStepTip" class="hidden">
-        <div class="modal-header" style="border-bottom: 2px solid #ef4444;">
-          <div>
-            <h3 style="font-size: 18px; font-weight: 800; color: #dc2626;">Payment in Progress</h3>
+          <div id="floorCanvas" class="relative w-full h-72 sm:h-80 bg-white rounded-xl border-2 border-dashed border-slate-300 overflow-hidden shadow-inner">
+            <!-- Seats rendered dynamically -->
           </div>
         </div>
 
-        <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 8px 12px; font-size: 13px; font-weight: 800; color: #334155; margin-top: 4px;">
-          Cashier: <span id="displayActiveCashier" style="color: #ea580c;"></span>
-        </div>
+        <!-- Session Setup Panel -->
+        <div class="w-full md:w-80 p-4 bg-white flex flex-col justify-between space-y-4 shrink-0">
+          <div class="space-y-3">
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-500">Selected Seat</span>
+              <span id="selectedSeatLabel" class="text-base font-black text-amber-600">None</span>
+            </div>
 
-        <div id="tipScreenChangeBox" class="hidden" style="background: #f0fdf4; border: 3px solid #16a34a; border-radius: 16px; padding: 16px 12px; text-align: center; margin-top: 10px; box-shadow: 0 4px 6px -1px rgba(22, 163, 74, 0.15);">
-          <div style="font-size: 14px; font-weight: 800; color: #166534; letter-spacing: 0.5px; text-transform: uppercase;">Change Due (お釣り)</div>
-          <div id="tipScreenChangeAmount" style="font-size: 38px; font-weight: 900; color: #15803d; line-height: 1.1; margin-top: 4px;">฿0</div>
-        </div>
+            <!-- Required: Server / Staff -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">
+                Server / Staff <span class="text-red-500">*</span>
+              </label>
+              <select id="sessionStaffSelect" onchange="validateSessionForm()" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm font-bold bg-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                <option value="">-- Select Staff --</option>
+              </select>
+            </div>
 
-        <div id="scanTipCalculationBlock" class="hidden" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px; background: #fff7ed; border: 1.5px solid #fed7aa; border-radius: 12px; padding: 12px;">
-          <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 800; color: #7c2d12;">
-            <span>Order Total:</span>
-            <span id="scanOrderTotalDisplay">฿0</span>
+            <!-- Optional: Customer Name -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">
+                Customer Name <span class="text-slate-400 font-normal">(Optional)</span>
+              </label>
+              <input type="text" id="sessionCustomerInput" placeholder="Guest" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-500 select-text">
+            </div>
+
+            <!-- Required: Guests Count (1-20) -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">
+                Guests <span class="text-red-500">*</span>
+              </label>
+              <div class="flex items-center space-x-2">
+                <button type="button" onclick="adjustGuests(-1)" class="w-10 h-10 rounded-xl bg-slate-200 hover:bg-slate-300 font-black text-lg">-</button>
+                <input type="number" id="sessionGuestsInput" value="1" min="1" max="20" readonly class="flex-1 text-center border border-slate-300 rounded-xl py-2 font-black text-base bg-slate-50">
+                <button type="button" onclick="adjustGuests(1)" class="w-10 h-10 rounded-xl bg-slate-200 hover:bg-slate-300 font-black text-lg">+</button>
+              </div>
+            </div>
+
+            <!-- Required: Nationality -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">
+                Nationality <span class="text-red-500">*</span>
+              </label>
+              <div class="grid grid-cols-3 gap-1.5">
+                <button type="button" onclick="selectNationality('Thai')" data-nat="Thai" class="nat-btn py-2 rounded-xl border-2 text-xs font-black">Thai</button>
+                <button type="button" onclick="selectNationality('Asia')" data-nat="Asia" class="nat-btn py-2 rounded-xl border-2 text-xs font-black">Asia</button>
+                <button type="button" onclick="selectNationality('Foreigner')" data-nat="Foreigner" class="nat-btn py-2 rounded-xl border-2 text-xs font-black">Foreigner</button>
+              </div>
+            </div>
           </div>
-          <div>
-            <label style="display: block; font-size: 12px; font-weight: 800; color: #9a3412; margin-bottom: 4px;">
-              Actual Paid Amount via Scan (฿) <span style="color: #ef4444;">*</span>
-            </label>
-            <input type="number" id="inputScanPaidAmount" oninput="calculateScanTip()" placeholder="0" style="width: 100%; border: 2px solid #fdba74; border-radius: 10px; padding: 10px; font-size: 18px; font-weight: 800; color: #1e293b; background: #fff; outline: none; user-select: text !important; -webkit-user-select: text !important;">
-          </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed #fdba74; padding-top: 8px;">
-            <span style="font-size: 14px; font-weight: 800; color: #7c2d12;">Calculated Tip:</span>
-            <span id="scanCalculatedTipDisplay" style="font-size: 20px; font-weight: 900; color: #ea580c;">฿0</span>
-          </div>
-        </div>
 
-        <div id="cashTipDirectBlock" style="margin-top: 10px;">
-          <label style="display: block; font-size: 13px; font-weight: 800; color: #475569; margin-bottom: 4px;">Tip Amount (฿)</label>
-          <input type="number" id="inputTipAmount" min="0" placeholder="0" oninput="validateFinalPaymentButton()" style="width: 100%; border: 2px solid #cbd5e1; border-radius: 10px; padding: 12px; font-size: 18px; font-weight: 800; color: #1e293b; outline: none; user-select: text !important; -webkit-user-select: text !important;">
-        </div>
-
-        <div style="margin-top: 10px;">
-          <label style="display: block; font-size: 12px; font-weight: 800; color: #64748b; margin-bottom: 4px;">
-            Tip Receiver <span style="color: #ef4444;">*</span>
-          </label>
-          <select id="selectTipReceiver" onchange="onTipReceiverChanged()" style="width: 100%; border: 2px solid #cbd5e1; border-radius: 10px; padding: 12px; font-size: 16px; font-weight: 700; color: #1e293b; background: #fff; outline: none;">
-          </select>
-        </div>
-
-        <div style="margin-top: 16px; display: flex; gap: 8px;">
-          <button type="button" onclick="backToPaymentSelect()" style="flex: 1; background: #e2e8f0; color: #475569; border: none; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 800;">
-            Back
+          <button id="btnStartSession" onclick="startOrResumeSession()" disabled class="w-full bg-amber-500 hover:bg-amber-600 disabled:bg-slate-300 disabled:text-slate-500 text-slate-950 font-black py-3.5 rounded-xl text-base shadow-md transition">
+            Start Session
           </button>
-          <button type="button" id="btnCompleteTransaction" onclick="submitTransaction()" style="flex: 1.6; background: #cbd5e1; color: #64748b; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 800;" disabled>
-            Complete
-          </button>
         </div>
-      </div>
 
-      <!-- ステップ3: 会計完了メッセージブロック -->
-      <div id="paymentSuccessContent" class="hidden" style="text-align: center; padding: 26px 10px;">
-        <div style="font-size: 54px; margin-bottom: 12px;">🎉</div>
-        <h3 style="font-size: 22px; font-weight: 900; color: #16a34a; margin-bottom: 6px;">Payment Completed!</h3>
-        <p style="font-size: 14px; font-weight: 700; color: #64748b;">Returning to Floor Map in 3 seconds...</p>
       </div>
-
     </div>
   </div>
 
+  <!-- ==========================================
+       MODAL 2: ITEM / ORDER DISCOUNT MODAL
+       ========================================== -->
+  <div id="discountModal" class="hidden fixed inset-0 bg-slate-950/75 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl w-full max-w-sm p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b pb-2.5">
+        <h3 id="discountModalTitle" class="font-black text-base text-slate-800">Discount</h3>
+        <button onclick="closeDiscountModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold leading-none">&times;</button>
+      </div>
+
+      <div id="discountTargetInfo" class="text-xs font-bold text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-200"></div>
+
+      <!-- Discount Type Switch -->
+      <div class="grid grid-cols-2 gap-2">
+        <button type="button" id="btnDiscTypeAmount" onclick="setDiscountType('amount')" class="py-2.5 rounded-xl border-2 font-black text-sm">
+          Amount (-฿)
+        </button>
+        <button type="button" id="btnDiscTypePercent" onclick="setDiscountType('percent')" class="py-2.5 rounded-xl border-2 font-black text-sm">
+          Percent (% Off)
+        </button>
+      </div>
+
+      <!-- Value Input -->
+      <div>
+        <label id="discountValueLabel" class="block text-xs font-bold text-slate-700 mb-1">Discount Amount (฿)</label>
+        <input type="number" id="discountValueInput" min="0" step="1" oninput="updateDiscountPreview()" placeholder="0" class="w-full border-2 border-slate-300 rounded-xl px-3 py-2.5 text-xl font-black text-right focus:outline-none focus:border-amber-500 select-text">
+        <!-- Quick Percent / Amount Chips -->
+        <div id="discountQuickChips" class="flex flex-wrap gap-1.5 mt-2"></div>
+      </div>
+
+      <!-- Live Preview -->
+      <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 flex justify-between items-center">
+        <span class="text-xs font-bold text-amber-900">Calculated Discount:</span>
+        <span id="discountPreviewAmount" class="text-lg font-black text-red-600">-฿0</span>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <button type="button" onclick="clearCurrentDiscount()" class="py-3 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-sm">
+          Remove
+        </button>
+        <button type="button" onclick="applyCurrentDiscount()" class="py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-sm shadow">
+          Apply
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL 3: PIN AUTH MODAL (TRAINING MODE)
+       ========================================== -->
+  <div id="pinModal" class="hidden fixed inset-0 bg-slate-950/80 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl w-full max-w-xs p-5 shadow-2xl space-y-4 text-center">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h3 class="font-black text-base text-slate-800">🔒 Admin / Training PIN</h3>
+        <button onclick="closePinModal()" class="text-slate-400 text-xl font-bold">&times;</button>
+      </div>
+      <input type="password" id="pinInputDisplay" readonly maxlength="4" placeholder="••••" class="w-full text-center text-2xl font-black tracking-[0.5em] py-2.5 border-2 border-slate-300 rounded-xl bg-slate-50">
+      <div id="pinErrorMsg" class="hidden text-xs font-bold text-red-600">Incorrect PIN</div>
+      <div class="grid grid-cols-3 gap-2">
+        <button onclick="pressPinDigit('1')" class="py-3 rounded-xl bg-slate-100 hover:bg-slate-200 font-black text-lg">1</button>
+        <button onclick="pressPinDigit('2')" class="py-3 rounded-xl bg-slate-100 hover:bg-slate-200 font-black text-lg">2</button>
+        <button onclick="pressPinDigit('3')" class="py-3 rounded-xl bg-slate-100 hover:bg-slate-200 font-black text-lg">3</button>
+        <button onclick="pressPinDigit('4')" class="py-3 rounded-xl bg-slate-100 hover:bg-slate-200 font-black text-lg">4</button>
+        <button onclick="pressPinDigit('5')" class="py-3 rounded-xl bg-slate-100 hover:bg-slate-200 font-black text-lg">5</button>
+        <button onclick="pressPinDigit('6')" class="py-3 rounded-xl bg-slate-100 hover:bg-slate-200 font-black text-lg">6</button>
+        <button onclick="pressPinDigit('7')" class="py-3 rounded-xl bg-slate-100 hover:bg-slate-200 font-black text-lg">7</button>
+        <button onclick="pressPinDigit('8')" class="py-3 rounded-xl bg-slate-100 hover:bg-slate-200 font-black text-lg">8</button>
+        <button onclick="pressPinDigit('9')" class="py-3 rounded-xl bg-slate-100 hover:bg-slate-200 font-black text-lg">9</button>
+        <button onclick="clearPinDigit()" class="py-3 rounded-xl bg-red-100 text-red-700 font-bold text-sm">Clear</button>
+        <button onclick="pressPinDigit('0')" class="py-3 rounded-xl bg-slate-100 hover:bg-slate-200 font-black text-lg">0</button>
+        <button onclick="submitPin()" class="py-3 rounded-xl bg-amber-500 text-slate-950 font-black text-sm">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL 4: ORDER CONFIRMATION MODAL
+       ========================================== -->
+  <div id="orderConfirmModal" class="hidden fixed inset-0 bg-slate-950/75 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl w-full max-w-md p-5 shadow-2xl space-y-4">
+      <h3 class="text-lg font-black text-slate-900 border-b pb-2">Confirm New Order</h3>
+      <div id="orderConfirmList" class="max-h-60 overflow-y-auto space-y-1.5 text-sm"></div>
+      <div id="orderConfirmStatus" class="hidden text-center py-3 bg-emerald-50 text-emerald-700 font-black rounded-xl border border-emerald-200">
+        ✅ Order Confirmed! Returning to Floor...
+      </div>
+      <div id="orderConfirmActions" class="grid grid-cols-2 gap-2.5 pt-2">
+        <button onclick="closeOrderConfirmModal()" class="py-3 rounded-xl bg-slate-200 font-bold text-slate-700">Back</button>
+        <button onclick="finalizeOrderItems()" class="py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black shadow">Confirm Order</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL 5: CHECKOUT / PAYMENT MODAL
+       ========================================== -->
+  <div id="checkoutModal" class="hidden fixed inset-0 bg-slate-950/80 flex items-center justify-center p-3 sm:p-4 z-50">
+    <div class="bg-white rounded-2xl w-full max-w-md max-h-[92vh] overflow-y-auto p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b pb-2.5">
+        <h3 class="text-lg font-black text-slate-900">Checkout & Payment</h3>
+        <button onclick="closeCheckoutModal()" id="btnCloseCheckout" class="text-slate-400 hover:text-slate-600 text-2xl font-bold leading-none">&times;</button>
+      </div>
+
+      <!-- Bill Breakdown -->
+      <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-1 text-sm">
+        <div class="flex justify-between text-slate-600">
+          <span>Subtotal</span>
+          <span id="coSubtotalDisplay" class="font-bold">฿0</span>
+        </div>
+        <div id="coDiscountRow" class="hidden flex justify-between text-red-600 font-bold">
+          <span>Discount</span>
+          <span id="coDiscountDisplay">-฿0</span>
+        </div>
+        <div class="flex justify-between text-2xl font-black text-slate-900 border-t pt-1.5">
+          <span>Total Due</span>
+          <span id="coTotalDueDisplay" class="text-amber-600">฿0</span>
+        </div>
+      </div>
+
+      <!-- Step 1: Cashier + Method Selection -->
+      <div id="coStepSelect" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">
+            Cashier <span class="text-red-500">*</span>
+          </label>
+          <select id="coCashierSelect" onchange="validateCheckoutCashier()" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-bold bg-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <option value="">-- Select Cashier --</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 pt-1">
+          <button id="btnPayCash" onclick="startCashFlow()" disabled class="py-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white font-black text-base shadow">
+            💵 Cash
+          </button>
+          <button id="btnPayScan" onclick="startScanFlow()" disabled class="py-4 rounded-xl bg-sky-600 hover:bg-sky-700 disabled:bg-slate-300 text-white font-black text-base shadow">
+            📱 Scan QR
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2A: Cash Payment Flow -->
+      <div id="coStepCash" class="hidden space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Cash Received (฿)</label>
+          <input type="number" id="cashReceivedInput" oninput="calculateCashChange()" placeholder="0" class="w-full border-2 border-slate-300 rounded-xl px-3 py-2.5 text-2xl font-black text-right focus:outline-none focus:border-emerald-500 select-text">
+          <div id="cashQuickButtons" class="flex flex-wrap gap-1.5 mt-2"></div>
+        </div>
+
+        <div class="bg-emerald-50 border-2 border-emerald-200 rounded-xl p-3 text-center">
+          <div class="text-xs font-bold text-emerald-800">Change Due</div>
+          <div id="cashChangeDisplay" class="text-3xl font-black text-emerald-600">฿0</div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Tip Amount (฿)</label>
+          <input type="number" id="cashTipInput" value="0" min="0" oninput="toggleTipReceiverVisibility('cash')" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-lg font-black text-right select-text">
+        </div>
+
+        <div id="cashTipReceiverWrap">
+          <label class="block text-xs font-bold text-slate-700 mb-1">Tip Receiver</label>
+          <select id="cashTipReceiverSelect" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-bold bg-white"></select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button onclick="backToCheckoutSelect()" class="py-3 rounded-xl bg-slate-200 font-bold text-slate-700 text-sm">Back</button>
+          <button id="btnConfirmCash" onclick="completeCheckout('Cash')" disabled class="py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white font-black text-sm shadow">
+            Complete Cash
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2B: Scan QR Payment Flow -->
+      <div id="coStepScan" class="hidden space-y-3">
+        <div class="bg-sky-50 border border-sky-200 rounded-xl p-3 text-center space-y-1">
+          <div class="text-xs font-black text-sky-900">PromptPay / Bank QR Scan</div>
+          <div class="text-xs text-sky-700">Verify customer slip & capture photo below</div>
+        </div>
+
+        <!-- Slip Camera Capture -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Slip Photo Capture</label>
+          <input type="file" id="scanSlipInput" accept="image/*" capture="environment" onchange="handleSlipCapture(event)" class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-sky-100 file:text-sky-800">
+          <img id="scanSlipPreview" class="hidden mt-2 w-full max-h-36 object-contain rounded-xl border border-slate-300 bg-slate-50" alt="Slip preview">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Actual Paid Amount (฿)</label>
+          <input type="number" id="scanActualPaidInput" oninput="calculateScanTip()" class="w-full border-2 border-slate-300 rounded-xl px-3 py-2.5 text-2xl font-black text-right focus:outline-none focus:border-sky-500 select-text">
+          <div class="flex justify-between text-xs font-bold mt-1 px-1">
+            <span class="text-slate-500">Auto Tip (Excess):</span>
+            <span id="scanAutoTipDisplay" class="text-amber-600">฿0</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Tip Receiver</label>
+          <select id="scanTipReceiverSelect" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-bold bg-white"></select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button onclick="backToCheckoutSelect()" class="py-3 rounded-xl bg-slate-200 font-bold text-slate-700 text-sm">Back</button>
+          <button id="btnConfirmScan" onclick="completeCheckout('Scan')" class="py-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-black text-sm shadow">
+            Complete Scan
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3: Processing / Done -->
+      <div id="coStepDone" class="hidden py-6 text-center space-y-2">
+        <div id="coDoneSpinner" class="text-3xl animate-spin inline-block">⏳</div>
+        <div id="coDoneTitle" class="text-lg font-black text-slate-800">Processing...</div>
+        <div id="coDoneSub" class="text-xs text-slate-500">Sending log to Google Sheets</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       GENERIC CONFIRMATION MODAL (DELETE / CANCEL)
+       ========================================== -->
+  <div id="genericConfirmModal" class="hidden fixed inset-0 bg-slate-950/75 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl w-full max-w-sm p-5 shadow-2xl space-y-4">
+      <h3 id="genericConfirmTitle" class="text-base font-black text-slate-900">Confirm</h3>
+      <p id="genericConfirmBody" class="text-sm text-slate-600"></p>
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <button onclick="closeGenericConfirm()" class="py-2.5 rounded-xl bg-slate-200 font-bold text-slate-700 text-sm">Cancel</button>
+        <button id="genericConfirmOkBtn" class="py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-black text-sm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       APPLICATION LOGIC
+       ========================================== -->
   <script>
-    const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzn0oZMZLNkU6p1OVl1tcoNn6ZahHGcvFSvopifuR1wXnNFVjoq1XHC-mOYAf1dbMp0ug/exec";
-    const MANAGER_PIN = "1536";
+    // ★ ここに「NC-ドリンク」の最新GASウェブアプリURL（/exec）を設定してください
+    const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzn0oZMZLNkU6p1OVl1tcoNn6ZahHGcvkT4-aF5C7T6r7d2Z0uC6V2eH4B9Z8P3M1Q/exec";
 
-    function safeGetArray(key, fallback) {
-      try {
-        const raw = localStorage.getItem(key);
-        if (!raw) return fallback;
-        const parsed = JSON.parse(raw);
-        return Array.isArray(parsed) && parsed.length > 0 ? parsed : fallback;
-      } catch (e) {
-        return fallback;
-      }
-    }
-
-    function safeGetObject(key, fallback) {
-      try {
-        const raw = localStorage.getItem(key);
-        if (!raw) return fallback;
-        const parsed = JSON.parse(raw);
-        return (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) ? parsed : fallback;
-      } catch (e) {
-        return fallback;
-      }
-    }
-
-    const SCALE_PRESETS = {
-      1: { barW: 42, barH: 42, tblW: 54, tblH: 44, font: 10 },
-      2: { barW: 50, barH: 50, tblW: 66, tblH: 54, font: 11 },
-      3: { barW: 58, barH: 58, tblW: 76, tblH: 62, font: 12 },
-      4: { barW: 66, barH: 66, tblW: 86, tblH: 70, font: 13 },
-      5: { barW: 76, barH: 76, tblW: 98, tblH: 80, font: 14 }
+    const STORAGE_KEYS = {
+      MASTER: "nc_pos_master_v2",
+      SEATS: "nc_pos_seats_v2",
+      SEAT_SIZE: "nc_pos_seat_size_v2",
+      SESSIONS: "nc_pos_sessions_v2"
     };
-    let currentScaleLevel = parseInt(localStorage.getItem('NC_POS_SEAT_SCALE')) || 3;
 
-    const DEFAULT_LAYOUT = [
-      { id: "Bar-1", label: "C1", type: "bar-seat", x: 15, y: 15 },
-      { id: "Bar-2", label: "C2", type: "bar-seat", x: 75, y: 15 },
-      { id: "Bar-3", label: "C3", type: "bar-seat", x: 135, y: 15 },
-      { id: "Bar-4", label: "C4", type: "bar-seat", x: 195, y: 15 },
-      { id: "T-1", label: "Table-1", type: "table-seat", x: 195, y: 85 },
-      { id: "T-2", label: "Table-2", type: "table-seat", x: 195, y: 155 },
-      { id: "T-3", label: "Table-3", type: "table-seat", x: 105, y: 115 },
-      { id: "T-4", label: "Table-4", type: "table-seat", x: 15, y: 115 }
+    const DEFAULT_SEATS = [
+      { id: "bar-1", name: "Bar-1", type: "bar", x: 12, y: 18 },
+      { id: "bar-2", name: "Bar-2", type: "bar", x: 34, y: 18 },
+      { id: "bar-3", name: "Bar-3", type: "bar", x: 56, y: 18 },
+      { id: "bar-4", name: "Bar-4", type: "bar", x: 78, y: 18 },
+      { id: "table-1", name: "Table-1", type: "table", x: 12, y: 60 },
+      { id: "table-2", name: "Table-2", type: "table", x: 34, y: 60 },
+      { id: "table-3", name: "Table-3", type: "table", x: 56, y: 60 },
+      { id: "table-4", name: "Table-4", type: "table", x: 78, y: 60 }
     ];
 
-    const FALLBACK_MENU = [
-      { id: "M01", name: "Singha Beer", category: "Beer", price: 120, hasPrice: true, totalCost: 45, grossProfit: 75 },
-      { id: "M02", name: "Chang Beer", category: "Beer", price: 100, hasPrice: true, totalCost: 40, grossProfit: 60 },
-      { id: "M03", name: "Leo Beer", category: "Beer", price: 100, hasPrice: true, totalCost: 40, grossProfit: 60 },
-      { id: "M04", name: "Gin Tonic", category: "Cocktail", price: 180, hasPrice: true, totalCost: 35, grossProfit: 145 },
-      { id: "M05", name: "Highball", category: "Cocktail", price: 160, hasPrice: true, totalCost: 30, grossProfit: 130 },
-      { id: "M06", name: "Mojito", category: "Cocktail", price: 200, hasPrice: true, totalCost: 40, grossProfit: 160 },
-      { id: "M07", name: "French Fries", category: "Food", price: 120, hasPrice: true, totalCost: 35, grossProfit: 85 },
-      { id: "M08", name: "Edamame", category: "Food", price: 80, hasPrice: true, totalCost: 25, grossProfit: 55 },
-      { id: "M09", name: "Cat Snack", category: "Other", price: 50, hasPrice: true, totalCost: 15, grossProfit: 35 },
-      { id: "M10", name: "Water", category: "Other", price: 40, hasPrice: true, totalCost: 10, grossProfit: 30 }
-    ];
+    const SIZE_CLASSES = {
+      XS: "w-14 h-12 text-[10px]",
+      S:  "w-16 h-14 text-xs",
+      M:  "w-20 h-16 text-xs",
+      L:  "w-24 h-20 text-sm",
+      XL: "w-28 h-24 text-base"
+    };
 
-    const FALLBACK_STAFF = [
-      { id: "store", name: "Store" },
-      { id: "staff1", name: "Staff 1" },
-      { id: "staff2", name: "Staff 2" },
-      { id: "staff3", name: "Staff 3" }
-    ];
+    let state = {
+      menu: [],
+      staff: [{ id: "store", name: "Store" }],
+      seats: [],
+      seatSize: "M",
+      sessions: {},
+      activeSeatId: null,
+      selectedModalSeatId: null,
+      selectedNationality: "Thai",
+      isEditMode: false,
+      isTrainingMode: false,
+      currentCategory: "ALL",
+      searchQuery: "",
+      pinBuffer: "",
+      discountContext: null, // { mode: 'item' | 'order', index: number, type: 'amount' | 'percent', value: number }
+      genericCallback: null
+    };
 
-    let menuItems = safeGetArray('NC_POS_MENU_CACHE', FALLBACK_MENU);
-    let staffList = safeGetArray('NC_POS_STAFF_CACHE', FALLBACK_STAFF);
-    let tableSessions = safeGetObject('NC_POS_SESSIONS', {});
-    let currentLayout = safeGetArray('NC_POS_LAYOUT', DEFAULT_LAYOUT).filter(s => s && s.id !== "Training");
-    if (currentLayout.length === 0) currentLayout = JSON.parse(JSON.stringify(DEFAULT_LAYOUT));
-    localStorage.setItem('NC_POS_LAYOUT', JSON.stringify(currentLayout));
+    // ==========================================
+    // INITIALIZATION
+    // ==========================================
+    window.addEventListener("DOMContentLoaded", () => {
+      loadLocalState();
+      renderCartContainers();
+      renderSeats();
+      syncMasterData(false);
+      updateClock();
+      setInterval(updateClock, 1000);
+      window.addEventListener("resize", () => {
+        clampAllSeats();
+        renderSeats();
+      });
+    });
 
-    let isEditingLayout = false;
-    let currentTable = "Bar-1";
-    let currentCustomer = "";
-    let selectedOrderStaff = "";
-    let selectedNationality = null;
-    let guestCount = 1;
-    let currentCategory = "All";
-    let currentSearchQuery = "";
+    function updateClock() {
+      const el = document.getElementById("clockDisplay");
+      if (!el) return;
+      const now = new Date();
+      el.textContent = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    }
 
-    let currentOrder = [];
-    let selectedPayment = null;
-    let slipImageBase64 = null;
-    let isSlipConfirmed = false;
-    let receivedCashAmount = 0;
-    let changeDueAmount = 0;
-    let selectedCashier = "";
-
-    setInterval(() => {
-      const clockEl = document.getElementById('clock');
-      if (clockEl) clockEl.innerText = new Date().toLocaleTimeString();
-    }, 1000);
-
-    /* ==================== GASからの動的データ取得（SWRキャッシュ方式） ==================== */
-    async function fetchMasterData() {
-      const syncEl = document.getElementById('syncStatus');
-      syncEl.innerText = "⟳ Syncing...";
-      syncEl.style.color = "#ea580c";
+    function loadLocalState() {
+      try {
+        const cachedMaster = JSON.parse(localStorage.getItem(STORAGE_KEYS.MASTER) || "null");
+        if (cachedMaster && Array.isArray(cachedMaster.menu)) {
+          state.menu = cachedMaster.menu;
+          if (Array.isArray(cachedMaster.staff) && cachedMaster.staff.length > 0) {
+            state.staff = cachedMaster.staff;
+          }
+        }
+      } catch (e) {}
 
       try {
-        const res = await fetch(`${GAS_ENDPOINT}?action=getMasterData`);
-        if (!res.ok) throw new Error("Sync failed");
+        const savedSeats = JSON.parse(localStorage.getItem(STORAGE_KEYS.SEATS) || "null");
+        state.seats = (Array.isArray(savedSeats) && savedSeats.length > 0) ? savedSeats : JSON.parse(JSON.stringify(DEFAULT_SEATS));
+      } catch (e) {
+        state.seats = JSON.parse(JSON.stringify(DEFAULT_SEATS));
+      }
+
+      const savedSize = localStorage.getItem(STORAGE_KEYS.SEAT_SIZE);
+      if (savedSize && SIZE_CLASSES[savedSize]) {
+        state.seatSize = savedSize;
+      }
+
+      try {
+        const savedSessions = JSON.parse(localStorage.getItem(STORAGE_KEYS.SESSIONS) || "{}");
+        state.sessions = savedSessions || {};
+      } catch (e) {
+        state.sessions = {};
+      }
+
+      populateStaffDropdowns();
+      renderCategoriesAndMenu();
+      updateSizeButtonsUI();
+    }
+
+    function saveSeatsAndSessions() {
+      localStorage.setItem(STORAGE_KEYS.SEATS, JSON.stringify(state.seats));
+      localStorage.setItem(STORAGE_KEYS.SESSIONS, JSON.stringify(state.sessions));
+    }
+
+    // ==========================================
+    // SWR MASTER DATA SYNC (doGet)
+    // ==========================================
+    async function syncMasterData(manual) {
+      const dot = document.getElementById("syncDot");
+      const text = document.getElementById("syncText");
+      dot.className = "w-2 h-2 rounded-full bg-amber-400 inline-block animate-pulse";
+      text.textContent = "Syncing...";
+
+      try {
+        const res = await fetch(GAS_ENDPOINT + "?t=" + Date.now(), { cache: "no-store" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
         const data = await res.json();
-
-        if (data.status === "success") {
-          if (Array.isArray(data.menu) && data.menu.length > 0) {
-            menuItems = data.menu;
-            localStorage.setItem('NC_POS_MENU_CACHE', JSON.stringify(menuItems));
-          }
+        if (data && data.status === "success" && Array.isArray(data.menu)) {
+          state.menu = data.menu;
           if (Array.isArray(data.staff) && data.staff.length > 0) {
-            staffList = data.staff;
-            localStorage.setItem('NC_POS_STAFF_CACHE', JSON.stringify(staffList));
+            state.staff = data.staff;
           }
-          syncEl.innerText = "● Live";
-          syncEl.style.color = "#16a34a";
-          
-          renderCategoryTabs();
-          renderMenu(currentCategory);
+          localStorage.setItem(STORAGE_KEYS.MASTER, JSON.stringify({
+            menu: state.menu,
+            staff: state.staff,
+            updatedAt: Date.now()
+          }));
           populateStaffDropdowns();
+          renderCategoriesAndMenu();
+          dot.className = "w-2 h-2 rounded-full bg-emerald-400 inline-block";
+          text.textContent = "Live";
+          return;
         }
+        throw new Error("Invalid payload");
       } catch (err) {
-        console.warn("GAS fetch fallback to cache:", err);
-        syncEl.innerText = "● Cache";
-        syncEl.style.color = "#64748b";
+        dot.className = "w-2 h-2 rounded-full bg-amber-400 inline-block";
+        text.textContent = "Cache";
       }
-    }
-
-    function toggleSpCart(open) {
-      const cart = document.getElementById('cartSidebar');
-      if (open) {
-        cart.classList.add('sp-open');
-      } else {
-        cart.classList.remove('sp-open');
-      }
-    }
-
-    function changeSeatScale(level) {
-      currentScaleLevel = level;
-      localStorage.setItem('NC_POS_SEAT_SCALE', currentScaleLevel);
-      updateSizeButtons();
-      renderFloorMap();
-    }
-
-    function updateSizeButtons() {
-      for (let i = 1; i <= 5; i++) {
-        const btn = document.getElementById(`btnSize-${i}`);
-        if (btn) {
-          if (i === currentScaleLevel) btn.classList.add('active');
-          else btn.classList.remove('active');
-        }
-      }
-    }
-
-    function renderFloorMap() {
-      const canvas = document.getElementById('floorCanvas');
-      canvas.innerHTML = '';
-      const preset = SCALE_PRESETS[currentScaleLevel] || SCALE_PRESETS[3];
-      const canvasW = canvas.clientWidth || 320;
-      const canvasH = canvas.clientHeight || 240;
-
-      currentLayout.forEach(seat => {
-        const div = document.createElement('div');
-        const session = tableSessions[seat.id];
-        const isOccupied = session && (session.active || (session.orderItems && session.orderItems.length > 0) || (session.customerName && session.customerName !== ''));
-        const isSelected = seat.id === currentTable;
-
-        div.className = `floor-item ${seat.type} ${isOccupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}`;
-        div.id = `seat-${seat.id}`;
-
-        let w = preset.barW, h = preset.barH;
-        if (seat.type === 'table-seat') { w = preset.tblW; h = preset.tblH; }
-
-        div.style.width = `${w}px`;
-        div.style.height = `${h}px`;
-        div.style.fontSize = `${preset.font}px`;
-
-        const maxX = Math.max(5, canvasW - w - 6);
-        const maxY = Math.max(5, canvasH - h - 6);
-        seat.x = Math.max(4, Math.min(Number(seat.x) || 15, maxX));
-        seat.y = Math.max(4, Math.min(Number(seat.y) || 15, maxY));
-
-        div.style.left = `${seat.x}px`;
-        div.style.top = `${seat.y}px`;
-        
-        let displayName = '';
-        if (isOccupied) {
-          displayName = (session && session.customerName && session.customerName.trim() !== '') ? session.customerName : 'GUEST';
-        }
-        div.innerHTML = `<span>${seat.label}</span>${displayName ? `<span style="font-size:9px; font-weight:700; opacity:0.9; margin-top:2px;">${displayName}</span>` : ''}`;
-
-        div.onclick = () => {
-          if (isEditingLayout) {
-            const newLabel = prompt(`Edit name for "${seat.label}":`, seat.label);
-            if (newLabel && newLabel.trim() !== "") {
-              seat.label = newLabel.trim();
-              saveLayoutToStorage();
-              renderFloorMap();
-            }
-            return;
-          }
-          selectSeat(seat.id);
-        };
-
-        attachDragListener(div, seat);
-        canvas.appendChild(div);
-      });
-      updateSizeButtons();
-    }
-
-    function selectSeat(seatId) {
-      currentTable = seatId;
-      const existingSession = tableSessions[currentTable];
-      currentCustomer = existingSession ? (existingSession.customerName || "") : "";
-      document.getElementById('inputCustomerName').value = currentCustomer;
-
-      selectedOrderStaff = (existingSession && existingSession.orderStaff) ? existingSession.orderStaff : "";
-      document.getElementById('selectOrderStaff').value = selectedOrderStaff;
-      
-      guestCount = (existingSession && existingSession.guestCount) ? existingSession.guestCount : 1;
-      document.getElementById('inputGuestCount').value = guestCount;
-      
-      selectedNationality = (existingSession && existingSession.nationality) ? existingSession.nationality : null;
-      document.querySelectorAll('.nat-btn').forEach(btn => btn.classList.remove('selected'));
-      if (selectedNationality) {
-        const btn = document.getElementById(`nat-${selectedNationality}`);
-        if (btn) btn.classList.add('selected');
-      }
-      checkStartOrderValidation();
-      renderFloorMap();
     }
 
     function populateStaffDropdowns() {
-      const orderStaffSel = document.getElementById('selectOrderStaff');
-      const curOrderVal = orderStaffSel.value;
-      orderStaffSel.innerHTML = '<option value="" disabled selected>-- Select Server / Staff --</option>';
-      staffList.filter(s => s && s.id !== 'store').forEach(st => {
-        const opt = document.createElement('option');
-        opt.value = st.name;
-        opt.innerText = st.name;
-        orderStaffSel.appendChild(opt);
-      });
-      if (curOrderVal) orderStaffSel.value = curOrderVal;
+      const serverSelect = document.getElementById("sessionStaffSelect");
+      const cashierSelect = document.getElementById("coCashierSelect");
+      const cashTipSelect = document.getElementById("cashTipReceiverSelect");
+      const scanTipSelect = document.getElementById("scanTipReceiverSelect");
 
-      const cashierSel = document.getElementById('selectCashier');
-      const curCashierVal = cashierSel.value;
-      cashierSel.innerHTML = '<option value="" disabled selected>-- Select Cashier --</option>';
-      staffList.filter(s => s && s.id !== 'store').forEach(st => {
-        const opt = document.createElement('option');
-        opt.value = st.name;
-        opt.innerText = st.name;
-        cashierSel.appendChild(opt);
-      });
-      if (curCashierVal) cashierSel.value = curCashierVal;
+      const prevServer = serverSelect.value;
+      const activeWorkers = state.staff.filter(s => s.name && s.name.toLowerCase() !== "store");
 
-      const tipSel = document.getElementById('selectTipReceiver');
-      const curTipVal = tipSel.value;
-      tipSel.innerHTML = `
-        <option value="" disabled selected>-- Select Receiver --</option>
-        <option value="No Tip">No Tip</option>
-      `;
-      staffList.filter(Boolean).forEach(st => {
-        const opt = document.createElement('option');
-        opt.value = st.name;
-        opt.innerText = st.name;
-        tipSel.appendChild(opt);
-      });
-      if (curTipVal) tipSel.value = curTipVal;
+      serverSelect.innerHTML = `<option value="">-- Select Staff --</option>` +
+        activeWorkers.map(s => `<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join("");
+      if (prevServer) serverSelect.value = prevServer;
+
+      cashierSelect.innerHTML = `<option value="">-- Select Cashier --</option>` +
+        activeWorkers.map(s => `<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join("");
+
+      const tipOptions = `<option value="No Tip">No Tip</option><option value="Store">Store</option>` +
+        activeWorkers.map(s => `<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join("");
+      cashTipSelect.innerHTML = tipOptions;
+      scanTipSelect.innerHTML = tipOptions;
     }
 
-    function openPinModal() {
-      document.getElementById('inputManagerPin').value = '';
-      document.getElementById('pinModal').classList.remove('hidden');
-      setTimeout(() => document.getElementById('inputManagerPin').focus(), 100);
+    // ==========================================
+    // FLOOR MAP & SESSION SETUP
+    // ==========================================
+    function openFloorModal() {
+      document.getElementById("floorModal").classList.remove("hidden");
+      clampAllSeats();
+      renderSeats();
     }
 
-    function closePinModal() {
-      document.getElementById('pinModal').classList.add('hidden');
-    }
-
-    function verifyManagerPin() {
-      const pin = document.getElementById('inputManagerPin').value;
-      if (pin === MANAGER_PIN) {
-        closePinModal();
-        currentTable = "Training";
-        currentCustomer = "Staff Training";
-        selectedOrderStaff = "Manager";
-        selectedNationality = "Thai";
-        guestCount = 1;
-        
-        tableSessions["Training"] = {
-          customerName: "Staff Training",
-          orderStaff: "Manager",
-          guestCount: 1,
-          nationality: "Thai",
-          orderItems: tableSessions["Training"]?.orderItems || [],
-          active: true
-        };
-        localStorage.setItem('NC_POS_SESSIONS', JSON.stringify(tableSessions));
-        currentOrder = tableSessions["Training"].orderItems || [];
-
-        document.getElementById('headerTable').innerText = "Training";
-        document.getElementById('headerCustomer').innerText = "Staff Training (🔒)";
-        document.getElementById('sessionModal').classList.add('hidden');
-        renderOrder();
-      } else {
-        alert("Incorrect PIN code.");
-        document.getElementById('inputManagerPin').value = '';
-      }
-    }
-
-    function attachDragListener(el, seat) {
-      let isDragging = false;
-      let startX, startY, origX, origY;
-
-      const onStart = (clientX, clientY) => {
-        if (!isEditingLayout) return;
-        isDragging = true;
-        el.classList.add('dragging');
-        startX = clientX;
-        startY = clientY;
-        origX = seat.x;
-        origY = seat.y;
-      };
-
-      const onMove = (clientX, clientY) => {
-        if (!isDragging) return;
-        const dx = clientX - startX;
-        const dy = clientY - startY;
-        const canvas = document.getElementById('floorCanvas');
-        const maxX = canvas.clientWidth - el.offsetWidth;
-        const maxY = canvas.clientHeight - el.offsetHeight;
-
-        seat.x = Math.max(2, Math.min(maxX - 2, origX + dx));
-        seat.y = Math.max(2, Math.min(maxY - 2, origY + dy));
-
-        el.style.left = `${seat.x}px`;
-        el.style.top = `${seat.y}px`;
-      };
-
-      const onEnd = () => {
-        if (!isDragging) return;
-        isDragging = false;
-        el.classList.remove('dragging');
-        saveLayoutToStorage();
-      };
-
-      el.addEventListener('touchstart', (e) => {
-        if (!isEditingLayout) return;
-        onStart(e.touches[0].clientX, e.touches[0].clientY);
-      }, { passive: true });
-      window.addEventListener('touchmove', (e) => {
-        if (!isDragging) return;
-        onMove(e.touches[0].clientX, e.touches[0].clientY);
-      }, { passive: true });
-      window.addEventListener('touchend', onEnd);
-
-      el.addEventListener('mousedown', (e) => onStart(e.clientX, e.clientY));
-      window.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY));
-      window.addEventListener('mouseup', onEnd);
+    function closeFloorModal() {
+      document.getElementById("floorModal").classList.add("hidden");
     }
 
     function toggleEditMode() {
-      isEditingLayout = !isEditingLayout;
-      const btn = document.getElementById('btnToggleEdit');
-      const canvas = document.getElementById('floorCanvas');
-      const tools = document.getElementById('editToolsBlock');
-
-      if (isEditingLayout) {
-        btn.innerText = "✓ Done";
-        btn.classList.add('active');
-        canvas.classList.add('editing');
-        tools.classList.remove('hidden');
+      state.isEditMode = !state.isEditMode;
+      const btn = document.getElementById("btnToggleEdit");
+      const bar = document.getElementById("editToolbar");
+      const guide = document.getElementById("floorGuideText");
+      if (state.isEditMode) {
+        btn.classList.add("bg-amber-500", "text-slate-950");
+        bar.classList.remove("hidden");
+        guide.textContent = "Drag to move seat • Tap seat to rename";
       } else {
-        btn.innerText = "⚙ Edit";
-        btn.classList.remove('active');
-        canvas.classList.remove('editing');
-        tools.classList.add('hidden');
-        saveLayoutToStorage();
+        btn.classList.remove("bg-amber-500", "text-slate-950");
+        bar.classList.add("hidden");
+        guide.textContent = "Tap a seat to select or resume";
       }
+      renderSeats();
     }
 
-    function saveLayoutToStorage() {
-      localStorage.setItem('NC_POS_LAYOUT', JSON.stringify(currentLayout));
+    function setSeatSize(size) {
+      state.seatSize = size;
+      localStorage.setItem(STORAGE_KEYS.SEAT_SIZE, size);
+      updateSizeButtonsUI();
+      clampAllSeats();
+      renderSeats();
     }
 
-    function addNewSeat(type) {
-      const count = currentLayout.filter(s => s.type === (type === 'Bar' ? 'bar-seat' : 'table-seat')).length + 1;
-      const newId = `${type}-${count}`;
-      currentLayout.push({
-        id: newId,
-        label: newId,
-        type: type === 'Bar' ? 'bar-seat' : 'table-seat',
-        x: 20 + (count * 10),
-        y: 60
+    function updateSizeButtonsUI() {
+      document.querySelectorAll(".size-btn").forEach(btn => {
+        if (btn.dataset.size === state.seatSize) {
+          btn.className = "size-btn px-2 py-0.5 text-xs font-black rounded border bg-amber-500 text-slate-950 border-amber-600";
+        } else {
+          btn.className = "size-btn px-2 py-0.5 text-xs font-bold rounded border bg-white text-slate-600 border-slate-300";
+        }
       });
-      saveLayoutToStorage();
-      renderFloorMap();
     }
 
-    function resetDefaultLayout() {
-      if (confirm("Reset floor layout to mobile-fit default?")) {
-        currentLayout = JSON.parse(JSON.stringify(DEFAULT_LAYOUT));
-        saveLayoutToStorage();
-        renderFloorMap();
+    function addSeat(type) {
+      const count = state.seats.filter(s => s.type === type).length + 1;
+      const name = (type === "bar" ? "Bar-" : "Table-") + count;
+      state.seats.push({
+        id: type + "-" + Date.now(),
+        name: name,
+        type: type,
+        x: 20 + (count * 5) % 55,
+        y: type === "bar" ? 25 : 65
+      });
+      saveSeatsAndSessions();
+      renderSeats();
+    }
+
+    function resetSeatsLayout() {
+      state.seats = JSON.parse(JSON.stringify(DEFAULT_SEATS));
+      saveSeatsAndSessions();
+      renderSeats();
+    }
+
+    function clampAllSeats() {
+      state.seats.forEach(seat => {
+        seat.x = Math.max(2, Math.min(82, Number(seat.x) || 10));
+        seat.y = Math.max(4, Math.min(76, Number(seat.y) || 15));
+      });
+    }
+
+    function renderSeats() {
+      const canvas = document.getElementById("floorCanvas");
+      if (!canvas) return;
+      canvas.innerHTML = "";
+
+      state.seats.forEach(seat => {
+        const session = state.sessions[seat.id];
+        const isOccupied = Boolean(session);
+        const isSelected = state.selectedModalSeatId === seat.id;
+
+        const el = document.createElement("div");
+        el.style.left = seat.x + "%";
+        el.style.top = seat.y + "%";
+
+        let colorCls = "bg-white border-slate-300 text-slate-800";
+        if (isOccupied) colorCls = "bg-amber-100 border-amber-500 text-amber-950";
+        if (isSelected) colorCls += " ring-4 ring-amber-400";
+
+        el.className = `seat-node absolute rounded-xl border-2 shadow-sm flex flex-col items-center justify-center p-1 cursor-pointer ${SIZE_CLASSES[state.seatSize]} ${colorCls}`;
+
+        el.innerHTML = `
+          <div class="font-black truncate max-w-full">${escapeHtml(seat.name)}</div>
+          ${isOccupied ? `<div class="text-[10px] font-bold text-amber-800 truncate max-w-full">${escapeHtml(session.customerName)} (${session.guestCount})</div>` : `<div class="text-[9px] text-slate-400">Open</div>`}
+        `;
+
+        setupSeatInteraction(el, seat, canvas);
+        canvas.appendChild(el);
+      });
+    }
+
+    function setupSeatInteraction(el, seat, canvas) {
+      let startX = 0, startY = 0, origX = seat.x, origY = seat.y, moved = false;
+
+      const onPointerDown = (e) => {
+        if (!state.isEditMode) return;
+        moved = false;
+        const pt = e.touches ? e.touches[0] : e;
+        startX = pt.clientX;
+        startY = pt.clientY;
+        origX = seat.x;
+        origY = seat.y;
+
+        const onPointerMove = (ev) => {
+          const p = ev.touches ? ev.touches[0] : ev;
+          const dx = p.clientX - startX;
+          const dy = p.clientY - startY;
+          if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
+          const rect = canvas.getBoundingClientRect();
+          const pctX = origX + (dx / rect.width) * 100;
+          const pctY = origY + (dy / rect.height) * 100;
+          seat.x = Math.max(2, Math.min(82, Math.round(pctX * 10) / 10));
+          seat.y = Math.max(4, Math.min(76, Math.round(pctY * 10) / 10));
+          el.style.left = seat.x + "%";
+          el.style.top = seat.y + "%";
+        };
+
+        const onPointerUp = () => {
+          window.removeEventListener("mousemove", onPointerMove);
+          window.removeEventListener("mouseup", onPointerUp);
+          window.removeEventListener("touchmove", onPointerMove);
+          window.removeEventListener("touchend", onPointerUp);
+          if (moved) {
+            saveSeatsAndSessions();
+          } else {
+            const newName = prompt("Rename seat:", seat.name);
+            if (newName && newName.trim() !== "") {
+              seat.name = newName.trim();
+              saveSeatsAndSessions();
+              renderSeats();
+            }
+          }
+        };
+
+        window.addEventListener("mousemove", onPointerMove);
+        window.addEventListener("mouseup", onPointerUp);
+        window.addEventListener("touchmove", onPointerMove, { passive: false });
+        window.addEventListener("touchend", onPointerUp);
+      };
+
+      el.addEventListener("mousedown", onPointerDown);
+      el.addEventListener("touchstart", onPointerDown, { passive: true });
+      el.addEventListener("click", () => {
+        if (state.isEditMode) return;
+        selectSeatInModal(seat.id);
+      });
+    }
+
+    function selectSeatInModal(seatId) {
+      state.selectedModalSeatId = seatId;
+      const seat = state.seats.find(s => s.id === seatId);
+      const session = state.sessions[seatId];
+      document.getElementById("selectedSeatLabel").textContent = seat ? seat.name : "None";
+
+      const delBtn = document.getElementById("btnDeleteSeatSession");
+      if (session) {
+        delBtn.classList.remove("hidden");
+        document.getElementById("sessionStaffSelect").value = session.staffName || "";
+        document.getElementById("sessionCustomerInput").value = session.customerName === "Guest" ? "" : session.customerName;
+        document.getElementById("sessionGuestsInput").value = session.guestCount || 1;
+        selectNationality(session.nationality || "Thai");
+        document.getElementById("btnStartSession").textContent = "Resume Table";
+      } else {
+        delBtn.classList.add("hidden");
+        document.getElementById("sessionCustomerInput").value = "";
+        document.getElementById("sessionGuestsInput").value = 1;
+        selectNationality("Thai");
+        document.getElementById("btnStartSession").textContent = "Start Session";
       }
+
+      validateSessionForm();
+      renderSeats();
     }
 
-    function changeGuestCount(delta) {
-      guestCount = Math.max(1, Math.min(20, guestCount + delta));
-      document.getElementById('inputGuestCount').value = guestCount;
-      checkStartOrderValidation();
+    function adjustGuests(delta) {
+      const inp = document.getElementById("sessionGuestsInput");
+      let val = (Number(inp.value) || 1) + delta;
+      val = Math.max(1, Math.min(20, val));
+      inp.value = val;
     }
 
     function selectNationality(nat) {
-      selectedNationality = nat;
-      document.querySelectorAll('.nat-btn').forEach(btn => btn.classList.remove('selected'));
-      const activeBtn = document.getElementById(`nat-${nat}`);
-      if (activeBtn) activeBtn.classList.add('selected');
-      checkStartOrderValidation();
+      state.selectedNationality = nat;
+      document.querySelectorAll(".nat-btn").forEach(btn => {
+        if (btn.dataset.nat === nat) {
+          btn.className = "nat-btn py-2 rounded-xl border-2 text-xs font-black bg-amber-500 border-amber-600 text-slate-950";
+        } else {
+          btn.className = "nat-btn py-2 rounded-xl border-2 text-xs font-bold bg-white border-slate-300 text-slate-600";
+        }
+      });
     }
 
-    function checkStartOrderValidation() {
-      const btn = document.querySelector('.btn-start-order');
-      const staffVal = document.getElementById('selectOrderStaff').value;
-
-      if (staffVal && staffVal !== "" && selectedNationality && guestCount >= 1) {
-        btn.disabled = false;
-        btn.style.opacity = "1";
-        btn.style.cursor = "pointer";
-      } else {
-        btn.disabled = true;
-        btn.style.opacity = "0.4";
-        btn.style.cursor = "not-allowed";
-      }
+    function validateSessionForm() {
+      const staff = document.getElementById("sessionStaffSelect").value;
+      const btn = document.getElementById("btnStartSession");
+      btn.disabled = !(state.selectedModalSeatId && staff);
     }
 
-    function openSessionModal() {
-      populateStaffDropdowns();
-      const existingSession = tableSessions[currentTable];
-      document.getElementById('inputCustomerName').value = (existingSession && existingSession.customerName) ? existingSession.customerName : '';
-      
-      selectedOrderStaff = (existingSession && existingSession.orderStaff) ? existingSession.orderStaff : '';
-      document.getElementById('selectOrderStaff').value = selectedOrderStaff;
+    function startOrResumeSession() {
+      const seatId = state.selectedModalSeatId;
+      const seat = state.seats.find(s => s.id === seatId);
+      const staffName = document.getElementById("sessionStaffSelect").value;
+      if (!seat || !staffName) return;
 
-      guestCount = (existingSession && existingSession.guestCount) ? existingSession.guestCount : 1;
-      document.getElementById('inputGuestCount').value = guestCount;
+      const customerName = document.getElementById("sessionCustomerInput").value.trim() || "Guest";
+      const guestCount = Number(document.getElementById("sessionGuestsInput").value) || 1;
+      const nationality = state.selectedNationality || "Thai";
 
-      selectedNationality = (existingSession && existingSession.nationality) ? existingSession.nationality : null;
-      document.querySelectorAll('.nat-btn').forEach(btn => btn.classList.remove('selected'));
-      if (selectedNationality) {
-        const btn = document.getElementById(`nat-${selectedNationality}`);
-        if (btn) btn.classList.add('selected');
-      }
-
-      checkStartOrderValidation();
-      renderFloorMap();
-      document.getElementById('sessionModal').classList.remove('hidden');
-    }
-
-    function confirmTableAndGuest() {
-      const staffVal = document.getElementById('selectOrderStaff').value;
-      if (!staffVal) {
-        alert("Please select Server / Staff");
-        return;
-      }
-      if (!selectedNationality) {
-        alert("Please select Nationality (Thai / Asia / Foreigner)");
-        return;
-      }
-
-      if (isEditingLayout) toggleEditMode();
-
-      selectedOrderStaff = staffVal;
-      const nameInput = document.getElementById('inputCustomerName').value.trim();
-      currentCustomer = nameInput !== "" ? nameInput : "Guest";
-
-      if (!tableSessions[currentTable]) {
-        tableSessions[currentTable] = {
-          customerName: currentCustomer,
-          orderStaff: selectedOrderStaff,
+      if (!state.sessions[seatId]) {
+        state.sessions[seatId] = {
+          seatId: seatId,
+          tableNo: seat.name,
+          staffName: staffName,
+          customerName: customerName,
           guestCount: guestCount,
-          nationality: selectedNationality,
-          orderItems: [],
-          active: true
+          nationality: nationality,
+          items: [],
+          orderDiscount: { type: "amount", value: 0 }
         };
       } else {
-        tableSessions[currentTable].customerName = currentCustomer;
-        tableSessions[currentTable].orderStaff = selectedOrderStaff;
-        tableSessions[currentTable].guestCount = guestCount;
-        tableSessions[currentTable].nationality = selectedNationality;
-        tableSessions[currentTable].active = true;
+        state.sessions[seatId].staffName = staffName;
+        state.sessions[seatId].customerName = customerName;
+        state.sessions[seatId].guestCount = guestCount;
+        state.sessions[seatId].nationality = nationality;
       }
-      localStorage.setItem('NC_POS_SESSIONS', JSON.stringify(tableSessions));
 
-      currentOrder = tableSessions[currentTable].orderItems || [];
-
-      document.getElementById('headerTable').innerText = currentTable;
-      document.getElementById('headerCustomer').innerText = `${currentCustomer} (${selectedOrderStaff} / ${guestCount}P / ${selectedNationality})`;
-      document.getElementById('sessionModal').classList.add('hidden');
-      renderOrder();
+      state.activeSeatId = seatId;
+      state.isTrainingMode = false;
+      saveSeatsAndSessions();
+      updateHeaderSessionBanner();
+      renderCartUI();
+      closeFloorModal();
     }
 
-    /* ==================== 全体商品検索バー制御 ==================== */
-    function handleMenuSearch() {
-      const inputEl = document.getElementById('menuSearchInput');
-      const clearBtn = document.getElementById('btnClearSearch');
-      currentSearchQuery = inputEl.value.trim().toLowerCase();
+    function confirmDeleteSeatSession() {
+      const seatId = state.selectedModalSeatId;
+      const seat = state.seats.find(s => s.id === seatId);
+      if (!seat || !state.sessions[seatId]) return;
 
-      if (currentSearchQuery !== "") {
-        clearBtn.classList.remove('hidden');
-        if (currentCategory !== "All") {
-          currentCategory = "All";
-          renderCategoryTabs();
+      openGenericConfirm(
+        `Reset ${seat.name}?`,
+        `All orders and guest data for ${seat.name} will be permanently cleared.`,
+        () => {
+          delete state.sessions[seatId];
+          if (state.activeSeatId === seatId) {
+            state.activeSeatId = null;
+            updateHeaderSessionBanner();
+            renderCartUI();
+          }
+          saveSeatsAndSessions();
+          selectSeatInModal(seatId);
         }
+      );
+    }
+
+    // ==========================================
+    // TRAINING MODE (PIN: 1536)
+    // ==========================================
+    function openPinModal() {
+      state.pinBuffer = "";
+      document.getElementById("pinInputDisplay").value = "";
+      document.getElementById("pinErrorMsg").classList.add("hidden");
+      document.getElementById("pinModal").classList.remove("hidden");
+    }
+
+    function closePinModal() {
+      document.getElementById("pinModal").classList.add("hidden");
+    }
+
+    function pressPinDigit(d) {
+      if (state.pinBuffer.length >= 4) return;
+      state.pinBuffer += d;
+      document.getElementById("pinInputDisplay").value = state.pinBuffer;
+      if (state.pinBuffer.length === 4) submitPin();
+    }
+
+    function clearPinDigit() {
+      state.pinBuffer = "";
+      document.getElementById("pinInputDisplay").value = "";
+      document.getElementById("pinErrorMsg").classList.add("hidden");
+    }
+
+    function submitPin() {
+      if (state.pinBuffer === "1536") {
+        closePinModal();
+        startTrainingSession();
       } else {
-        clearBtn.classList.add('hidden');
+        document.getElementById("pinErrorMsg").classList.remove("hidden");
+        state.pinBuffer = "";
+        document.getElementById("pinInputDisplay").value = "";
       }
-      renderMenu(currentCategory);
     }
 
-    function clearMenuSearch() {
-      const inputEl = document.getElementById('menuSearchInput');
-      inputEl.value = "";
-      currentSearchQuery = "";
-      document.getElementById('btnClearSearch').classList.add('hidden');
-      renderMenu(currentCategory);
+    function startTrainingSession() {
+      state.isTrainingMode = true;
+      state.activeSeatId = "TRAINING";
+      state.sessions["TRAINING"] = {
+        seatId: "TRAINING",
+        tableNo: "Training",
+        staffName: "Staff Training",
+        customerName: "Training",
+        guestCount: 1,
+        nationality: "Thai",
+        items: [],
+        orderDiscount: { type: "amount", value: 0 }
+      };
+      updateHeaderSessionBanner();
+      renderCartUI();
+      closeFloorModal();
     }
 
-    /* カテゴリタブ動的生成 */
-    function renderCategoryTabs() {
-      const tabsContainer = document.getElementById('categoryTabs');
-      const categories = ["All", ...new Set(menuItems.map(item => item.category).filter(Boolean))];
-      
-      tabsContainer.innerHTML = '';
-      categories.forEach(cat => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = `cat-btn ${cat === currentCategory ? 'active' : ''}`;
-        btn.innerText = cat.toUpperCase();
-        btn.onclick = () => filterCategory(cat, btn);
-        tabsContainer.appendChild(btn);
+    function updateHeaderSessionBanner() {
+      const title = document.getElementById("headerSessionTitle");
+      const sub = document.getElementById("headerSessionSub");
+      if (state.isTrainingMode) {
+        title.textContent = "Training | Staff Training (🔒)";
+        sub.textContent = "Inventory consumption mode (฿0 checkout)";
+        return;
+      }
+      const session = state.sessions[state.activeSeatId];
+      if (!session) {
+        title.textContent = "NC-POS | Select Table";
+        sub.textContent = "Tap Floor to start session";
+      } else {
+        title.textContent = `${session.tableNo} | ${session.customerName}`;
+        sub.textContent = `Staff: ${session.staffName} • ${session.guestCount} guests (${session.nationality})`;
+      }
+    }
+
+    // ==========================================
+    // MENU SEARCH, CATEGORIES & GRID
+    // ==========================================
+    function handleSearchInput() {
+      const input = document.getElementById("menuSearchInput");
+      state.searchQuery = input.value.trim().toLowerCase();
+      document.getElementById("clearSearchBtn").classList.toggle("hidden", state.searchQuery === "");
+      renderMenuGrid();
+    }
+
+    function clearSearchInput() {
+      const input = document.getElementById("menuSearchInput");
+      input.value = "";
+      state.searchQuery = "";
+      document.getElementById("clearSearchBtn").classList.add("hidden");
+      renderMenuGrid();
+    }
+
+    function selectCategory(cat) {
+      state.currentCategory = cat;
+      renderCategoriesAndMenu();
+    }
+
+    function renderCategoriesAndMenu() {
+      const tabContainer = document.getElementById("categoryTabsContainer");
+      const cats = ["ALL"];
+      state.menu.forEach(item => {
+        if (item.category && !cats.includes(item.category)) {
+          cats.push(item.category);
+        }
       });
-    }
 
-    /* 売単価が空欄かどうかを判定 */
-    function isItemUnpriced(item) {
-      if (item.hasPrice === false) return true;
-      if (item.price === null || item.price === undefined || item.price === "") return true;
-      return isNaN(Number(item.price));
-    }
-
-    function renderMenu(category = 'All') {
-      currentCategory = category;
-      const grid = document.getElementById('menuGrid');
-      grid.innerHTML = '';
-
-      let filtered = menuItems;
-
-      if (currentSearchQuery !== "") {
-        filtered = menuItems.filter(i => {
-          const nameEn = (i.name || "").toLowerCase();
-          const nameJa = (i.nameJa || "").toLowerCase();
-          return nameEn.includes(currentSearchQuery) || nameJa.includes(currentSearchQuery);
-        });
-      } else if (category !== 'All') {
-        filtered = menuItems.filter(i => i.category === category);
+      if (!cats.includes(state.currentCategory)) {
+        state.currentCategory = "ALL";
       }
+
+      tabContainer.innerHTML = cats.map(c => {
+        const active = c === state.currentCategory;
+        const cls = active
+          ? "bg-amber-500 text-slate-950 font-black shadow-sm"
+          : "bg-white text-slate-700 font-bold hover:bg-slate-50";
+        return `<button class="cat-tab px-3.5 py-1.5 rounded-lg text-xs sm:text-sm whitespace-nowrap transition ${cls}" onclick="selectCategory('${escapeJs(c)}')">${escapeHtml(c)}</button>`;
+      }).join("");
+
+      renderMenuGrid();
+    }
+
+    function renderMenuGrid() {
+      const grid = document.getElementById("menuGridContainer");
+      const filtered = state.menu.filter(item => {
+        if (state.searchQuery !== "") {
+          const hay = ((item.name || "") + " " + (item.nameJa || "")).toLowerCase();
+          return hay.includes(state.searchQuery);
+        }
+        if (state.currentCategory === "ALL") return true;
+        return item.category === state.currentCategory;
+      });
 
       if (filtered.length === 0) {
-        grid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #94a3b8; margin-top: 24px; font-weight: 700; font-size: 14px;">No matching items found</p>';
+        grid.innerHTML = `<div class="col-span-full text-center text-slate-400 py-12 font-bold">No items found</div>`;
         return;
       }
 
-      filtered.forEach(item => {
-        const unpriced = isItemUnpriced(item);
-        const btn = document.createElement('div');
-        btn.className = `menu-card ${unpriced ? 'menu-card-disabled' : ''}`;
-
-        if (!unpriced) {
-          btn.onclick = () => addItemToOrder(item);
+      grid.innerHTML = filtered.map(item => {
+        const selectable = item.hasPrice === true && item.price !== null && item.price !== undefined;
+        if (!selectable) {
+          return `
+            <div class="bg-slate-200/80 border border-slate-300 rounded-xl p-3 flex flex-col justify-between opacity-55 cursor-not-allowed min-h-[84px]">
+              <div class="font-bold text-xs sm:text-sm text-slate-500 line-clamp-2">${escapeHtml(item.name)}</div>
+              <div class="text-[11px] font-semibold text-slate-400 mt-1">${escapeHtml(item.category || "")}</div>
+            </div>
+          `;
         }
-
-        const priceHtml = unpriced ? '' : `<div class="menu-price">฿${Number(item.price)}</div>`;
-        btn.innerHTML = `
-          <div class="menu-name">${item.name}</div>
-          ${priceHtml}
+        return `
+          <button onclick="addItemToCart('${escapeJs(item.id)}')" class="bg-white hover:border-amber-400 active:scale-[0.98] border border-slate-200 rounded-xl p-3 text-left flex flex-col justify-between shadow-sm transition min-h-[84px]">
+            <div>
+              <div class="font-black text-xs sm:text-sm text-slate-800 line-clamp-2 leading-snug">${escapeHtml(item.name)}</div>
+              ${item.nameJa && item.nameJa !== item.name ? `<div class="text-[10px] text-slate-400 truncate mt-0.5">${escapeHtml(item.nameJa)}</div>` : ""}
+            </div>
+            <div class="flex items-center justify-between mt-2 pt-1 border-t border-slate-100">
+              <span class="text-[10px] font-bold text-slate-400 truncate max-w-[60%]">${escapeHtml(item.category || "")}</span>
+              <span class="text-sm sm:text-base font-black text-amber-600">฿${item.price}</span>
+            </div>
+          </button>
         `;
-        grid.appendChild(btn);
-      });
+      }).join("");
     }
 
-    function filterCategory(cat, el) {
-      currentCategory = cat;
-      if (currentSearchQuery !== "") {
-        document.getElementById('menuSearchInput').value = "";
-        currentSearchQuery = "";
-        document.getElementById('btnClearSearch').classList.add('hidden');
+    // ==========================================
+    // CART, ITEM DISCOUNT & ORDER DISCOUNT
+    // ==========================================
+    function renderCartContainers() {
+      const template = (suffix) => `
+        <div class="px-4 py-2.5 border-b bg-slate-50 flex items-center justify-between shrink-0">
+          <h2 class="font-black text-slate-800 text-base">Order Cart</h2>
+          <button onclick="clearPendingItems()" class="text-xs text-red-500 hover:underline font-bold">Clear Pending</button>
+        </div>
+        <div id="cartItemsList_${suffix}" class="flex-1 overflow-y-auto p-3 space-y-2"></div>
+        <div class="p-3.5 border-t bg-slate-50 space-y-2 shrink-0">
+          <div class="flex justify-between text-xs font-bold text-slate-500">
+            <span>Subtotal</span>
+            <span id="cartSubtotal_${suffix}">฿0</span>
+          </div>
+          <div id="cartItemDiscRow_${suffix}" class="hidden flex justify-between text-xs font-bold text-red-600">
+            <span>Item Discounts</span>
+            <span id="cartItemDisc_${suffix}">-฿0</span>
+          </div>
+          <div class="flex items-center justify-between text-xs font-bold text-slate-700">
+            <button onclick="openOrderDiscountModal()" class="text-amber-700 bg-amber-100 hover:bg-amber-200 px-2.5 py-1 rounded-lg font-black">
+              % Order Discount
+            </button>
+            <span id="cartOrderDisc_${suffix}" class="text-red-600 font-black">฿0</span>
+          </div>
+          <div class="flex justify-between text-xl font-black text-slate-900 border-t pt-1.5">
+            <span>Total</span>
+            <span id="cartNetTotal_${suffix}" class="text-amber-600">฿0</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <button id="btnConfirmOrder_${suffix}" onclick="openOrderConfirmModal()" disabled class="py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white font-black text-sm shadow">
+              Order
+            </button>
+            <button id="btnProceedPay_${suffix}" onclick="openCheckoutModal()" disabled class="py-3 rounded-xl bg-amber-500 hover:bg-amber-600 disabled:bg-slate-300 text-slate-950 font-black text-sm shadow">
+              Proceed to Payment
+            </button>
+          </div>
+        </div>
+      `;
+      document.getElementById("desktopCartMount").innerHTML = template("desk");
+      document.getElementById("mobileCartMount").innerHTML = template("mob");
+      renderCartUI();
+    }
+
+    function openMobileCartSheet() {
+      document.getElementById("mobileCartBackdrop").classList.remove("hidden");
+      document.getElementById("mobileCartSheet").classList.remove("translate-y-full");
+    }
+
+    function closeMobileCartSheet() {
+      document.getElementById("mobileCartBackdrop").classList.add("hidden");
+      document.getElementById("mobileCartSheet").classList.add("translate-y-full");
+    }
+
+    function getActiveSession() {
+      if (!state.activeSeatId) return null;
+      return state.sessions[state.activeSeatId] || null;
+    }
+
+    function addItemToCart(menuId) {
+      const session = getActiveSession();
+      if (!session) {
+        openFloorModal();
+        return;
       }
-      document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
-      el.classList.add('active');
-      renderMenu(cat);
-    }
+      const product = state.menu.find(m => m.id === menuId);
+      if (!product || !product.hasPrice) return;
 
-    function addItemToOrder(item) {
-      if (isItemUnpriced(item)) return;
+      // 未確定アイテムに同一商品・割引なしがあれば数量加算
+      const existingIdx = session.items.findIndex(it =>
+        it.menuId === product.id &&
+        !it.ordered &&
+        (!it.discount || it.discount.value === 0)
+      );
 
-      const numericPrice = Number(item.price) || 0;
-      const unconfirmed = currentOrder.find(i => i.id === item.id && !i.confirmed);
-      if (unconfirmed) {
-        unconfirmed.quantity += 1;
+      if (existingIdx !== -1) {
+        session.items[existingIdx].quantity += 1;
       } else {
-        const unitCost = Number(item.totalCost) || 0;
-        const unitProfit = (item.grossProfit !== undefined) ? Number(item.grossProfit) : (numericPrice - unitCost);
-        currentOrder.push({
-          ...item,
-          price: numericPrice,
-          totalCost: unitCost,
-          grossProfit: unitProfit,
+        session.items.push({
+          menuId: product.id,
+          name: product.name,
+          category: product.category,
+          price: Number(product.price) || 0,
+          unitCost: Number(product.totalCost) || 0,
           quantity: 1,
-          confirmed: false
+          ordered: false,
+          discount: { type: "amount", value: 0 }
         });
       }
-      renderOrder();
+
+      saveSeatsAndSessions();
+      renderCartUI();
     }
 
-    function changeQuantity(index, delta) {
-      const item = currentOrder[index];
-      if (!item || item.confirmed) return;
-      item.quantity += delta;
-      if (item.quantity <= 0) {
-        currentOrder.splice(index, 1);
+    function changeItemQty(idx, delta) {
+      const session = getActiveSession();
+      if (!session || !session.items[idx] || session.items[idx].ordered) return;
+      session.items[idx].quantity += delta;
+      if (session.items[idx].quantity <= 0) {
+        session.items.splice(idx, 1);
       }
-      renderOrder();
+      saveSeatsAndSessions();
+      renderCartUI();
     }
 
-    function cancelConfirmedItem(index) {
-      const item = currentOrder[index];
-      if (!item) return;
-      if (confirm(`Cancel confirmed item: "${item.name} (${item.quantity}x)"?`)) {
-        currentOrder.splice(index, 1);
-        renderOrder();
-      }
+    function cancelOrderedItem(idx) {
+      const session = getActiveSession();
+      if (!session || !session.items[idx]) return;
+      const item = session.items[idx];
+      openGenericConfirm(
+        "Cancel Ordered Item?",
+        `Remove [Ordered] ${item.name} x ${item.quantity} from this table?`,
+        () => {
+          session.items.splice(idx, 1);
+          saveSeatsAndSessions();
+          renderCartUI();
+        }
+      );
     }
 
-    function clearCurrentOrder() {
-      if (currentOrder.length === 0) return;
-      if (confirm("Clear current order?")) {
-        currentOrder = [];
-        renderOrder();
-      }
+    function clearPendingItems() {
+      const session = getActiveSession();
+      if (!session) return;
+      session.items = session.items.filter(it => it.ordered);
+      saveSeatsAndSessions();
+      renderCartUI();
     }
 
-    function renderOrder() {
-      const container = document.getElementById('orderItemsContainer');
-      const btnCheckout = document.getElementById('btnCheckout');
-      const btnSendOrder = document.getElementById('btnSendOrder');
-
-      if (tableSessions[currentTable]) {
-        tableSessions[currentTable].orderItems = currentOrder;
-        localStorage.setItem('NC_POS_SESSIONS', JSON.stringify(tableSessions));
+    function computeLineFinancials(item) {
+      const lineTotal = (Number(item.price) || 0) * (Number(item.quantity) || 1);
+      const lineCost = (Number(item.unitCost) || 0) * (Number(item.quantity) || 1);
+      let discountAmount = 0;
+      if (item.discount && Number(item.discount.value) > 0) {
+        if (item.discount.type === "percent") {
+          discountAmount = Math.round(lineTotal * (Number(item.discount.value) / 100));
+        } else {
+          discountAmount = Math.round(Number(item.discount.value));
+        }
       }
-      
-      const totalCount = currentOrder.reduce((acc, i) => acc + i.quantity, 0);
-      document.getElementById('spCartCount').innerText = totalCount;
+      discountAmount = Math.max(0, Math.min(lineTotal, discountAmount));
+      const netLineTotal = Math.max(0, lineTotal - discountAmount);
+      const lineProfit = Math.round((netLineTotal - lineCost) * 100) / 100;
+      return { lineTotal, discountAmount, netLineTotal, lineCost, lineProfit };
+    }
 
-      if (currentOrder.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: #94a3b8; margin-top: 30px; font-weight: 600; font-size: 14px;">Select items from menu</p>';
-        document.getElementById('subtotalDisplay').innerText = '฿0';
-        document.getElementById('totalDisplay').innerText = '฿0';
-        document.getElementById('spCartTotal').innerText = '฿0';
-        btnCheckout.disabled = true;
-        if (btnSendOrder) btnSendOrder.disabled = true;
-        return;
+    function computeSessionTotals(session) {
+      if (!session) {
+        return {
+          subtotal: 0,
+          itemDiscountTotal: 0,
+          orderDiscountTotal: 0,
+          totalDiscount: 0,
+          netTotal: 0,
+          totalCost: 0,
+          grossProfit: 0,
+          totalCount: 0,
+          pendingCount: 0
+        };
       }
 
-      container.innerHTML = '';
-      let total = 0;
-      let hasUnconfirmed = false;
+      let subtotal = 0;
+      let itemDiscountTotal = 0;
+      let totalCost = 0;
+      let totalCount = 0;
+      let pendingCount = 0;
 
-      currentOrder.forEach((item, index) => {
-        const itemTotal = item.price * item.quantity;
-        total += itemTotal;
-        if (!item.confirmed) hasUnconfirmed = true;
+      session.items.forEach(item => {
+        const fin = computeLineFinancials(item);
+        subtotal += fin.lineTotal;
+        itemDiscountTotal += fin.discountAmount;
+        totalCost += fin.lineCost;
+        totalCount += Number(item.quantity) || 1;
+        if (!item.ordered) pendingCount += Number(item.quantity) || 1;
+      });
 
-        const row = document.createElement('div');
-        row.className = `cart-item-row ${item.confirmed ? 'is-confirmed' : ''}`;
+      const afterItemDisc = Math.max(0, subtotal - itemDiscountTotal);
+      let orderDiscountTotal = 0;
+      if (session.orderDiscount && Number(session.orderDiscount.value) > 0) {
+        if (session.orderDiscount.type === "percent") {
+          orderDiscountTotal = Math.round(afterItemDisc * (Number(session.orderDiscount.value) / 100));
+        } else {
+          orderDiscountTotal = Math.round(Number(session.orderDiscount.value));
+        }
+      }
+      orderDiscountTotal = Math.max(0, Math.min(afterItemDisc, orderDiscountTotal));
 
-        const actionControl = item.confirmed
-          ? `<button type="button" onclick="cancelConfirmedItem(${index})" class="btn-item-cancel">Cancel</button>`
-          : `<div class="qty-controls">
-               <button type="button" onclick="changeQuantity(${index}, -1)" class="btn-qty">-</button>
-               <span class="qty-display">${item.quantity}</span>
-               <button type="button" onclick="changeQuantity(${index}, 1)" class="btn-qty">+</button>
-             </div>`;
+      const totalDiscount = itemDiscountTotal + orderDiscountTotal;
+      const netTotal = Math.max(0, subtotal - totalDiscount);
+      const grossProfit = Math.round((netTotal - totalCost) * 100) / 100;
 
-        row.innerHTML = `
-          <div>
-            <div class="item-info-name">
-              ${item.name} 
-              ${item.confirmed ? '<span style="font-size:10px; color:#10b981; font-weight:800; margin-left:4px;">[Ordered]</span>' : ''}
-            </div>
-            <div class="item-info-calc">฿${item.price} &times; ${item.quantity} = ฿${itemTotal}</div>
+      return {
+        subtotal,
+        itemDiscountTotal,
+        orderDiscountTotal,
+        totalDiscount,
+        netTotal,
+        totalCost,
+        grossProfit,
+        totalCount,
+        pendingCount
+      };
+    }
+
+    function renderCartUI() {
+      const session = getActiveSession();
+      const totals = computeSessionTotals(session);
+
+      document.getElementById("mobileBarCount").textContent = totals.totalCount;
+      document.getElementById("mobileBarTotal").textContent = `฿${totals.netTotal}`;
+
+      ["desk", "mob"].forEach(suffix => {
+        const listEl = document.getElementById(`cartItemsList_${suffix}`);
+        if (!listEl) return;
+
+        if (!session || session.items.length === 0) {
+          listEl.innerHTML = `<div class="text-center text-slate-400 text-sm py-10 font-bold">No items in cart</div>`;
+        } else {
+          listEl.innerHTML = session.items.map((item, idx) => {
+            const fin = computeLineFinancials(item);
+            const hasDisc = fin.discountAmount > 0;
+            const discBadge = hasDisc
+              ? `<span class="text-[10px] font-black bg-red-100 text-red-700 px-1.5 py-0.5 rounded">-${item.discount.type === "percent" ? item.discount.value + "%" : "฿" + fin.discountAmount}</span>`
+              : "";
+
+            return `
+              <div class="border rounded-xl p-2.5 ${item.ordered ? "bg-slate-50 border-slate-200" : "bg-white border-amber-300"} space-y-1.5">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="min-w-0">
+                    <div class="flex items-center space-x-1.5">
+                      ${item.ordered ? `<span class="text-[10px] font-black bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded">[Ordered]</span>` : `<span class="text-[10px] font-black bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded">New</span>`}
+                      <span class="font-bold text-xs text-slate-800 truncate">${escapeHtml(item.name)}</span>
+                    </div>
+                    <div class="flex items-center space-x-1.5 mt-1">
+                      <span class="text-xs font-black text-slate-900">฿${fin.netLineTotal}</span>
+                      ${hasDisc ? `<span class="text-[10px] line-through text-slate-400">฿${fin.lineTotal}</span>` : ""}
+                      ${discBadge}
+                    </div>
+                  </div>
+
+                  <div class="flex items-center space-x-1 shrink-0">
+                    <button onclick="openItemDiscountModal(${idx})" class="px-2 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 font-black text-[11px]">
+                      Disc
+                    </button>
+                    ${item.ordered
+                      ? `<button onclick="cancelOrderedItem(${idx})" class="px-2 py-1 rounded-lg bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 font-bold text-[11px]">[Cancel]</button>`
+                      : `
+                        <button onclick="changeItemQty(${idx}, -1)" class="w-7 h-7 rounded-lg bg-slate-200 font-black text-sm">-</button>
+                        <span class="w-5 text-center text-xs font-black">${item.quantity}</span>
+                        <button onclick="changeItemQty(${idx}, 1)" class="w-7 h-7 rounded-lg bg-slate-200 font-black text-sm">+</button>
+                      `
+                    }
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join("");
+        }
+
+        document.getElementById(`cartSubtotal_${suffix}`).textContent = `฿${totals.subtotal}`;
+        const itemDiscRow = document.getElementById(`cartItemDiscRow_${suffix}`);
+        if (totals.itemDiscountTotal > 0) {
+          itemDiscRow.classList.remove("hidden");
+          document.getElementById(`cartItemDisc_${suffix}`).textContent = `-฿${totals.itemDiscountTotal}`;
+        } else {
+          itemDiscRow.classList.add("hidden");
+        }
+
+        const orderDiscLabel = totals.orderDiscountTotal > 0
+          ? `-฿${totals.orderDiscountTotal}${session && session.orderDiscount && session.orderDiscount.type === "percent" ? ` (${session.orderDiscount.value}%)` : ""}`
+          : "฿0";
+        document.getElementById(`cartOrderDisc_${suffix}`).textContent = orderDiscLabel;
+        document.getElementById(`cartNetTotal_${suffix}`).textContent = `฿${totals.netTotal}`;
+
+        document.getElementById(`btnConfirmOrder_${suffix}`).disabled = totals.pendingCount === 0;
+        document.getElementById(`btnProceedPay_${suffix}`).disabled = !session || session.items.length === 0;
+      });
+    }
+
+    // ==========================================
+    // DISCOUNT MODAL (ITEM & ORDER LEVEL)
+    // ==========================================
+    function openItemDiscountModal(idx) {
+      const session = getActiveSession();
+      if (!session || !session.items[idx]) return;
+      const item = session.items[idx];
+      const existing = item.discount || { type: "amount", value: 0 };
+
+      state.discountContext = {
+        mode: "item",
+        index: idx,
+        type: existing.type || "amount",
+        value: Number(existing.value) || 0
+      };
+
+      document.getElementById("discountModalTitle").textContent = "Item Discount";
+      document.getElementById("discountTargetInfo").textContent = `${item.name} x ${item.quantity} (Base: ฿${item.price * item.quantity})`;
+      setupDiscountModalUI();
+      document.getElementById("discountModal").classList.remove("hidden");
+    }
+
+    function openOrderDiscountModal() {
+      const session = getActiveSession();
+      if (!session || session.items.length === 0) return;
+      const totals = computeSessionTotals(session);
+      const afterItem = Math.max(0, totals.subtotal - totals.itemDiscountTotal);
+      const existing = session.orderDiscount || { type: "amount", value: 0 };
+
+      state.discountContext = {
+        mode: "order",
+        index: -1,
+        type: existing.type || "amount",
+        value: Number(existing.value) || 0
+      };
+
+      document.getElementById("discountModalTitle").textContent = "Order Discount (Entire Bill)";
+      document.getElementById("discountTargetInfo").textContent = `Eligible Subtotal: ฿${afterItem}`;
+      setupDiscountModalUI();
+      document.getElementById("discountModal").classList.remove("hidden");
+    }
+
+    function closeDiscountModal() {
+      document.getElementById("discountModal").classList.add("hidden");
+      state.discountContext = null;
+    }
+
+    function setDiscountType(type) {
+      if (!state.discountContext) return;
+      state.discountContext.type = type;
+      setupDiscountModalUI();
+    }
+
+    function setupDiscountModalUI() {
+      const ctx = state.discountContext;
+      if (!ctx) return;
+
+      const btnAmt = document.getElementById("btnDiscTypeAmount");
+      const btnPct = document.getElementById("btnDiscTypePercent");
+      const label = document.getElementById("discountValueLabel");
+      const input = document.getElementById("discountValueInput");
+      const chips = document.getElementById("discountQuickChips");
+
+      if (ctx.type === "percent") {
+        btnPct.className = "py-2.5 rounded-xl border-2 font-black text-sm bg-amber-500 border-amber-600 text-slate-950";
+        btnAmt.className = "py-2.5 rounded-xl border-2 font-bold text-sm bg-white border-slate-300 text-slate-600";
+        label.textContent = "Discount Percentage (%)";
+        chips.innerHTML = [5, 10, 15, 20, 50, 100].map(v =>
+          `<button type="button" onclick="setQuickDiscountValue(${v})" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-black">${v}%</button>`
+        ).join("");
+      } else {
+        btnAmt.className = "py-2.5 rounded-xl border-2 font-black text-sm bg-amber-500 border-amber-600 text-slate-950";
+        btnPct.className = "py-2.5 rounded-xl border-2 font-bold text-sm bg-white border-slate-300 text-slate-600";
+        label.textContent = "Discount Amount (฿)";
+        chips.innerHTML = [20, 50, 100, 200, 500].map(v =>
+          `<button type="button" onclick="setQuickDiscountValue(${v})" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-black">-฿${v}</button>`
+        ).join("");
+      }
+
+      input.value = ctx.value > 0 ? ctx.value : "";
+      updateDiscountPreview();
+    }
+
+    function setQuickDiscountValue(val) {
+      document.getElementById("discountValueInput").value = val;
+      updateDiscountPreview();
+    }
+
+    function updateDiscountPreview() {
+      const ctx = state.discountContext;
+      const session = getActiveSession();
+      if (!ctx || !session) return;
+
+      let rawVal = Math.max(0, Number(document.getElementById("discountValueInput").value) || 0);
+      if (ctx.type === "percent") rawVal = Math.min(100, rawVal);
+
+      let baseAmount = 0;
+      if (ctx.mode === "item" && session.items[ctx.index]) {
+        const it = session.items[ctx.index];
+        baseAmount = (Number(it.price) || 0) * (Number(it.quantity) || 1);
+      } else {
+        const totals = computeSessionTotals(session);
+        baseAmount = Math.max(0, totals.subtotal - totals.itemDiscountTotal);
+      }
+
+      const calc = ctx.type === "percent"
+        ? Math.round(baseAmount * (rawVal / 100))
+        : Math.min(baseAmount, Math.round(rawVal));
+
+      document.getElementById("discountPreviewAmount").textContent = `-฿${calc}`;
+    }
+
+    function applyCurrentDiscount() {
+      const ctx = state.discountContext;
+      const session = getActiveSession();
+      if (!ctx || !session) return;
+
+      let val = Math.max(0, Number(document.getElementById("discountValueInput").value) || 0);
+      if (ctx.type === "percent") val = Math.min(100, val);
+
+      if (ctx.mode === "item" && session.items[ctx.index]) {
+        session.items[ctx.index].discount = { type: ctx.type, value: val };
+      } else if (ctx.mode === "order") {
+        session.orderDiscount = { type: ctx.type, value: val };
+      }
+
+      saveSeatsAndSessions();
+      renderCartUI();
+      closeDiscountModal();
+    }
+
+    function clearCurrentDiscount() {
+      const ctx = state.discountContext;
+      const session = getActiveSession();
+      if (!ctx || !session) return;
+
+      if (ctx.mode === "item" && session.items[ctx.index]) {
+        session.items[ctx.index].discount = { type: "amount", value: 0 };
+      } else if (ctx.mode === "order") {
+        session.orderDiscount = { type: "amount", value: 0 };
+      }
+
+      saveSeatsAndSessions();
+      renderCartUI();
+      closeDiscountModal();
+    }
+
+    // ==========================================
+    // ORDER CONFIRMATION FLOW
+    // ==========================================
+    function openOrderConfirmModal() {
+      const session = getActiveSession();
+      if (!session) return;
+      const pending = session.items.filter(it => !it.ordered);
+      if (pending.length === 0) return;
+
+      document.getElementById("orderConfirmList").innerHTML = pending.map(it => {
+        const fin = computeLineFinancials(it);
+        return `
+          <div class="flex justify-between items-center bg-slate-50 p-2 rounded-lg border">
+            <span class="font-bold">${escapeHtml(it.name)} x ${it.quantity}</span>
+            <span class="font-black text-amber-600">฿${fin.netLineTotal}</span>
           </div>
-          <div>${actionControl}</div>
         `;
-        container.appendChild(row);
-      });
+      }).join("");
 
-      document.getElementById('subtotalDisplay').innerText = `฿${total}`;
-      document.getElementById('totalDisplay').innerText = `฿${total}`;
-      document.getElementById('spCartTotal').innerText = `฿${total}`;
-      
-      btnCheckout.disabled = false;
-      if (btnSendOrder) btnSendOrder.disabled = !hasUnconfirmed;
-    }
-
-    function confirmCurrentOrderOnly() {
-      const unconfirmedItems = currentOrder.filter(i => !i.confirmed);
-      if (unconfirmedItems.length === 0) {
-        alert("No newly added items to order.");
-        return;
-      }
-
-      document.getElementById('confirmModalTable').innerText = currentTable;
-      document.getElementById('confirmModalCustomer').innerText = currentCustomer;
-
-      const container = document.getElementById('confirmOrderItemsList');
-      container.innerHTML = '';
-      let orderBatchTotal = 0;
-
-      unconfirmedItems.forEach(item => {
-        const itemTotal = item.price * item.quantity;
-        orderBatchTotal += itemTotal;
-
-        const row = document.createElement('div');
-        row.style.display = 'flex';
-        row.style.justifyContent = 'space-between';
-        row.style.fontSize = '14px';
-        row.style.fontWeight = '700';
-        row.innerHTML = `
-          <span>${item.name} &times; ${item.quantity}</span>
-          <span style="color: #334155;">฿${itemTotal}</span>
-        `;
-        container.appendChild(row);
-      });
-
-      document.getElementById('confirmModalTotal').innerText = `฿${orderBatchTotal}`;
-      
-      document.getElementById('orderConfirmContent').classList.remove('hidden');
-      document.getElementById('orderSuccessContent').classList.add('hidden');
-      document.getElementById('orderConfirmModal').classList.remove('hidden');
+      document.getElementById("orderConfirmStatus").classList.add("hidden");
+      document.getElementById("orderConfirmActions").classList.remove("hidden");
+      document.getElementById("orderConfirmModal").classList.remove("hidden");
     }
 
     function closeOrderConfirmModal() {
-      document.getElementById('orderConfirmModal').classList.add('hidden');
+      document.getElementById("orderConfirmModal").classList.add("hidden");
     }
 
-    function executeFinalOrder() {
-      currentOrder.forEach(i => i.confirmed = true);
+    function finalizeOrderItems() {
+      const session = getActiveSession();
+      if (!session) return;
+      session.items.forEach(it => { it.ordered = true; });
+      saveSeatsAndSessions();
+      renderCartUI();
+      closeMobileCartSheet();
 
-      if (tableSessions[currentTable]) {
-        tableSessions[currentTable].orderItems = currentOrder;
-        tableSessions[currentTable].active = true;
-        localStorage.setItem('NC_POS_SESSIONS', JSON.stringify(tableSessions));
-      }
-
-      renderOrder();
-      toggleSpCart(false);
-
-      document.getElementById('orderConfirmContent').classList.add('hidden');
-      document.getElementById('orderSuccessContent').classList.remove('hidden');
+      document.getElementById("orderConfirmActions").classList.add("hidden");
+      document.getElementById("orderConfirmStatus").classList.remove("hidden");
 
       setTimeout(() => {
         closeOrderConfirmModal();
-        openSessionModal();
+        openFloorModal();
       }, 3000);
     }
 
-    function confirmDeleteTableInfoModal() {
-      const session = tableSessions[currentTable];
-      document.getElementById('delModalTable').innerText = currentTable;
-      document.getElementById('delModalCustomer').innerText = (session && session.customerName) ? session.customerName : 'GUEST';
+    // ==========================================
+    // CHECKOUT & PAYMENT FLOW + GAS doPost
+    // ==========================================
+    function openCheckoutModal() {
+      const session = getActiveSession();
+      if (!session || session.items.length === 0) return;
 
-      const listContainer = document.getElementById('delModalItemsList');
-      listContainer.innerHTML = '';
-
-      if (!session || !session.orderItems || session.orderItems.length === 0) {
-        listContainer.innerHTML = '<div style="color: #64748b; font-size: 13px;">(No active orders)</div>';
-      } else {
-        session.orderItems.forEach(item => {
-          const row = document.createElement('div');
-          row.style.display = 'flex';
-          row.style.justifyContent = 'space-between';
-          row.style.fontSize = '13px';
-          row.style.fontWeight = '700';
-          row.innerHTML = `
-            <span>${item.name} &times; ${item.quantity}</span>
-            <span>฿${item.price * item.quantity}</span>
-          `;
-          listContainer.appendChild(row);
-        });
-      }
-
-      document.getElementById('deleteTableInfoContent').classList.remove('hidden');
-      document.getElementById('deleteSuccessContent').classList.add('hidden');
-      document.getElementById('deleteTableInfoModal').classList.remove('hidden');
-    }
-
-    function closeDeleteTableInfoModal() {
-      document.getElementById('deleteTableInfoModal').classList.add('hidden');
-    }
-
-    function executeDeleteTableInfo() {
-      delete tableSessions[currentTable];
-      localStorage.setItem('NC_POS_SESSIONS', JSON.stringify(tableSessions));
-      
-      currentOrder = [];
-      currentCustomer = "";
-
-      document.getElementById('deleteTableInfoContent').classList.add('hidden');
-      document.getElementById('deleteSuccessContent').classList.remove('hidden');
-
-      setTimeout(() => {
-        closeDeleteTableInfoModal();
-        openSessionModal();
-      }, 3000);
-    }
-
-    function onCashierChanged() {
-      selectedCashier = document.getElementById('selectCashier').value;
-      const btnCash = document.getElementById('btnMethodCash');
-      const btnPP = document.getElementById('btnMethodPP');
-
-      if (selectedCashier && selectedCashier.trim() !== '') {
-        btnCash.disabled = false;
-        btnPP.disabled = false;
-      } else {
-        btnCash.disabled = true;
-        btnPP.disabled = true;
-      }
-    }
-
-    function openPaymentModal() {
-      toggleSpCart(false);
-
-      if (currentTable === "Training") {
-        if (confirm("Finalize training order? Drinks & food will be recorded for stock inventory.")) {
-          submitTrainingTransaction();
-        }
+      // Training Mode: skip Cash/Scan/Tip and send ฿0 inventory log immediately
+      if (state.isTrainingMode) {
+        submitOrderToGas("Training", 0, "No Tip", "Staff Training");
         return;
       }
 
-      const total = currentOrder.reduce((acc, i) => acc + (i.price * i.quantity), 0);
-      document.getElementById('modalTotalDisplay').innerText = `฿${total}`;
-      
-      populateStaffDropdowns();
-      if (selectedOrderStaff) {
-        document.getElementById('selectCashier').value = selectedOrderStaff;
-        onCashierChanged();
+      const totals = computeSessionTotals(session);
+      document.getElementById("coSubtotalDisplay").textContent = `฿${totals.subtotal}`;
+      const discRow = document.getElementById("coDiscountRow");
+      if (totals.totalDiscount > 0) {
+        discRow.classList.remove("hidden");
+        document.getElementById("coDiscountDisplay").textContent = `-฿${totals.totalDiscount}`;
       } else {
-        resetPaymentState();
+        discRow.classList.add("hidden");
       }
-      
-      document.getElementById('paymentStepSelect').classList.remove('hidden');
-      document.getElementById('paymentStepTip').classList.add('hidden');
-      document.getElementById('paymentSuccessContent').classList.add('hidden');
-      document.getElementById('paymentModal').classList.remove('hidden');
+      document.getElementById("coTotalDueDisplay").textContent = `฿${totals.netTotal}`;
+
+      const cashierSel = document.getElementById("coCashierSelect");
+      cashierSel.value = session.staffName || "";
+      validateCheckoutCashier();
+
+      backToCheckoutSelect();
+      document.getElementById("checkoutModal").classList.remove("hidden");
     }
 
-    function closePaymentModal() {
-      document.getElementById('paymentModal').classList.add('hidden');
-      resetPaymentState();
+    function closeCheckoutModal() {
+      document.getElementById("checkoutModal").classList.add("hidden");
     }
 
-    function resetPaymentState() {
-      selectedPayment = null;
-      slipImageBase64 = null;
-      isSlipConfirmed = false;
-      receivedCashAmount = 0;
-      changeDueAmount = 0;
-      selectedCashier = "";
-
-      document.getElementById('selectCashier').value = "";
-      document.getElementById('cashArea').classList.add('hidden');
-      document.getElementById('promptPayArea').classList.add('hidden');
-      document.getElementById('slipPreviewBlock').classList.add('hidden');
-      document.getElementById('cameraActionBlock').classList.remove('hidden');
-      
-      const btnCash = document.getElementById('btnMethodCash');
-      const btnPP = document.getElementById('btnMethodPP');
-      btnCash.classList.remove('selected');
-      btnPP.classList.remove('selected');
-      btnCash.disabled = true;
-      btnPP.disabled = true;
-      
-      document.getElementById('inputReceivedCash').value = '';
-      
-      const btnProceedCash = document.getElementById('btnProceedCashTip');
-      btnProceedCash.disabled = true;
-      btnProceedCash.style.background = "#cbd5e1";
-      btnProceedCash.style.color = "#64748b";
-      
-      const btnProceedScan = document.getElementById('btnProceedScanTip');
-      btnProceedScan.disabled = true;
-      btnProceedScan.style.background = "#cbd5e1";
-      btnProceedScan.style.color = "#64748b";
-
-      const btnConfirm = document.getElementById('btnConfirmSlip');
-      btnConfirm.innerText = "Confirm OK";
-      btnConfirm.style.background = "#16a34a";
-
-      document.getElementById('inputTipAmount').value = '';
-      document.getElementById('inputScanPaidAmount').value = '';
-      document.getElementById('scanCalculatedTipDisplay').innerText = '฿0';
+    function validateCheckoutCashier() {
+      const hasCashier = Boolean(document.getElementById("coCashierSelect").value);
+      document.getElementById("btnPayCash").disabled = !hasCashier;
+      document.getElementById("btnPayScan").disabled = !hasCashier;
     }
 
-    function selectMethod(method) {
-      if (!selectedCashier) {
-        alert("Please select Cashier first.");
-        return;
-      }
-
-      selectedPayment = method;
-      const btnCash = document.getElementById('btnMethodCash');
-      const btnPP = document.getElementById('btnMethodPP');
-      const cashArea = document.getElementById('cashArea');
-      const ppArea = document.getElementById('promptPayArea');
-
-      if (method === 'Cash') {
-        btnCash.classList.add('selected');
-        btnPP.classList.remove('selected');
-        cashArea.classList.remove('hidden');
-        ppArea.classList.add('hidden');
-      } else {
-        btnPP.classList.add('selected');
-        btnCash.classList.remove('selected');
-        ppArea.classList.remove('hidden');
-        cashArea.classList.add('hidden');
-      }
+    function backToCheckoutSelect() {
+      document.getElementById("coStepSelect").classList.remove("hidden");
+      document.getElementById("coStepCash").classList.add("hidden");
+      document.getElementById("coStepScan").classList.add("hidden");
+      document.getElementById("coStepDone").classList.add("hidden");
     }
 
-    function checkCashReceivedInput() {
-      const total = currentOrder.reduce((acc, i) => acc + (i.price * i.quantity), 0);
-      const val = parseFloat(document.getElementById('inputReceivedCash').value) || 0;
-      receivedCashAmount = val;
+    function startCashFlow() {
+      const session = getActiveSession();
+      const totals = computeSessionTotals(session);
+      const due = totals.netTotal;
 
-      const btn = document.getElementById('btnProceedCashTip');
+      document.getElementById("coStepSelect").classList.add("hidden");
+      document.getElementById("coStepCash").classList.remove("hidden");
 
-      if (val >= total) {
-        changeDueAmount = val - total;
-        btn.disabled = false;
-        btn.style.background = "#ea580c";
-        btn.style.color = "#ffffff";
-      } else {
-        changeDueAmount = 0;
-        btn.disabled = true;
-        btn.style.background = "#cbd5e1";
-        btn.style.color = "#64748b";
-      }
+      const inp = document.getElementById("cashReceivedInput");
+      inp.value = due === 0 ? "0" : "";
+      document.getElementById("cashTipInput").value = "0";
+      document.getElementById("cashTipReceiverSelect").value = "No Tip";
+
+      const suggestions = [due, Math.ceil(due / 100) * 100, Math.ceil(due / 500) * 500, 1000]
+        .filter((v, idx, arr) => v >= due && arr.indexOf(v) === idx);
+      document.getElementById("cashQuickButtons").innerHTML = suggestions.map(v =>
+        `<button type="button" onclick="setCashReceived(${v})" class="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-black">฿${v}</button>`
+      ).join("");
+
+      calculateCashChange();
+    }
+
+    function setCashReceived(val) {
+      document.getElementById("cashReceivedInput").value = val;
+      calculateCashChange();
+    }
+
+    function calculateCashChange() {
+      const session = getActiveSession();
+      const due = computeSessionTotals(session).netTotal;
+      const received = Number(document.getElementById("cashReceivedInput").value) || 0;
+      const change = Math.max(0, received - due);
+      document.getElementById("cashChangeDisplay").textContent = `฿${change}`;
+      document.getElementById("btnConfirmCash").disabled = received < due;
+    }
+
+    function toggleTipReceiverVisibility() {}
+
+    function startScanFlow() {
+      const session = getActiveSession();
+      const due = computeSessionTotals(session).netTotal;
+
+      document.getElementById("coStepSelect").classList.add("hidden");
+      document.getElementById("coStepScan").classList.remove("hidden");
+
+      document.getElementById("scanSlipInput").value = "";
+      document.getElementById("scanSlipPreview").classList.add("hidden");
+      document.getElementById("scanActualPaidInput").value = due;
+      document.getElementById("scanTipReceiverSelect").value = "No Tip";
+      calculateScanTip();
     }
 
     function handleSlipCapture(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
+      const file = e.target.files && e.target.files[0];
+      const preview = document.getElementById("scanSlipPreview");
+      if (!file) {
+        preview.classList.add("hidden");
+        return;
+      }
       const reader = new FileReader();
-      reader.onload = (event) => {
-        slipImageBase64 = event.target.result;
-        document.getElementById('slipPreviewImg').src = slipImageBase64;
-        document.getElementById('cameraActionBlock').classList.add('hidden');
-        document.getElementById('slipPreviewBlock').classList.remove('hidden');
-        isSlipConfirmed = false;
+      reader.onload = (ev) => {
+        preview.src = ev.target.result;
+        preview.classList.remove("hidden");
       };
       reader.readAsDataURL(file);
     }
 
-    function confirmSlipPhoto() {
-      if (!slipImageBase64) return;
-      isSlipConfirmed = true;
-      const btn = document.getElementById('btnConfirmSlip');
-      btn.innerText = "✓ Confirmed";
-      btn.style.background = "#64748b";
-
-      proceedToTipScreen();
-    }
-
-    function proceedToTipScreen() {
-      if (selectedPayment === 'Scan' && !slipImageBase64) {
-        alert("Please take a photo of the slip first.");
-        return;
-      }
-
-      document.getElementById('paymentStepSelect').classList.add('hidden');
-      document.getElementById('paymentStepTip').classList.remove('hidden');
-
-      document.getElementById('displayActiveCashier').innerText = selectedCashier;
-
-      const total = currentOrder.reduce((acc, i) => acc + (i.price * i.quantity), 0);
-      const changeBox = document.getElementById('tipScreenChangeBox');
-      const scanBlock = document.getElementById('scanTipCalculationBlock');
-      const cashDirectBlock = document.getElementById('cashTipDirectBlock');
-
-      if (selectedPayment === 'Cash') {
-        document.getElementById('tipScreenChangeAmount').innerText = `฿${changeDueAmount}`;
-        changeBox.classList.remove('hidden');
-        scanBlock.classList.add('hidden');
-        cashDirectBlock.classList.remove('hidden');
-        document.getElementById('inputTipAmount').value = '';
-      } else {
-        changeBox.classList.add('hidden');
-        scanBlock.classList.remove('hidden');
-        cashDirectBlock.classList.add('hidden');
-        document.getElementById('scanOrderTotalDisplay').innerText = `฿${total}`;
-        document.getElementById('inputScanPaidAmount').value = '';
-        document.getElementById('scanCalculatedTipDisplay').innerText = `฿0`;
-        document.getElementById('inputTipAmount').value = '';
-      }
-
-      document.getElementById('selectTipReceiver').value = "";
-      validateFinalPaymentButton();
-    }
-
     function calculateScanTip() {
-      const total = currentOrder.reduce((acc, i) => acc + (i.price * i.quantity), 0);
-      const paidInput = document.getElementById('inputScanPaidAmount').value;
-      const paid = parseFloat(paidInput) || 0;
-      
-      let tip = 0;
-      if (paid >= total) {
-        tip = paid - total;
-      }
-
-      document.getElementById('scanCalculatedTipDisplay').innerText = `฿${tip}`;
-      document.getElementById('inputTipAmount').value = tip;
-
-      const receiverSel = document.getElementById('selectTipReceiver');
-      if (tip === 0 && paidInput !== '') {
-        receiverSel.value = "No Tip";
-      } else if (tip > 0 && receiverSel.value === "No Tip") {
-        receiverSel.value = "";
-      }
-
-      validateFinalPaymentButton();
+      const session = getActiveSession();
+      const due = computeSessionTotals(session).netTotal;
+      const actual = Number(document.getElementById("scanActualPaidInput").value) || 0;
+      const tip = Math.max(0, actual - due);
+      document.getElementById("scanAutoTipDisplay").textContent = `฿${tip}`;
     }
 
-    function onTipReceiverChanged() {
-      const receiver = document.getElementById('selectTipReceiver').value;
-      const total = currentOrder.reduce((acc, i) => acc + (i.price * i.quantity), 0);
+    function completeCheckout(method) {
+      const cashier = document.getElementById("coCashierSelect").value;
+      let tipAmount = 0;
+      let tipReceiver = "No Tip";
 
-      if (receiver === 'No Tip') {
-        document.getElementById('inputTipAmount').value = 0;
-        if (selectedPayment === 'Scan') {
-          document.getElementById('inputScanPaidAmount').value = total;
-          document.getElementById('scanCalculatedTipDisplay').innerText = `฿0`;
-        }
-      }
-      validateFinalPaymentButton();
-    }
-
-    function backToPaymentSelect() {
-      document.getElementById('paymentStepTip').classList.add('hidden');
-      document.getElementById('paymentStepSelect').classList.remove('hidden');
-    }
-
-    function validateFinalPaymentButton() {
-      const sel = document.getElementById('selectTipReceiver').value;
-      const btn = document.getElementById('btnCompleteTransaction');
-      
-      let isValid = false;
-      if (sel && sel.trim() !== '') {
-        if (selectedPayment === 'Scan') {
-          const paid = parseFloat(document.getElementById('inputScanPaidAmount').value);
-          const total = currentOrder.reduce((acc, i) => acc + (i.price * i.quantity), 0);
-          if (!isNaN(paid) && paid >= total) {
-            isValid = true;
-          }
-        } else {
-          isValid = true;
-        }
+      if (method === "Cash") {
+        tipAmount = Math.max(0, Number(document.getElementById("cashTipInput").value) || 0);
+        tipReceiver = tipAmount > 0 ? document.getElementById("cashTipReceiverSelect").value : "No Tip";
+      } else if (method === "Scan") {
+        const session = getActiveSession();
+        const due = computeSessionTotals(session).netTotal;
+        const actual = Number(document.getElementById("scanActualPaidInput").value) || due;
+        tipAmount = Math.max(0, actual - due);
+        tipReceiver = tipAmount > 0 ? document.getElementById("scanTipReceiverSelect").value : "No Tip";
       }
 
-      if (isValid) {
-        btn.disabled = false;
-        btn.style.background = "#16a34a";
-        btn.style.color = "#ffffff";
-      } else {
-        btn.disabled = true;
-        btn.style.background = "#cbd5e1";
-        btn.style.color = "#64748b";
-      }
+      submitOrderToGas(method, tipAmount, tipReceiver, cashier);
     }
 
-    function submitTrainingTransaction() {
-      const orderId = `TR-${Date.now().toString().slice(-6)}`;
-      let totalCostSum = 0;
-      const mappedItems = currentOrder.map(i => {
-        const unitCost = Number(i.totalCost) || 0;
-        const lineCost = unitCost * i.quantity;
-        totalCostSum += lineCost;
+    function submitOrderToGas(method, tipAmount, tipReceiver, cashierName) {
+      const session = getActiveSession();
+      if (!session) return;
+
+      document.getElementById("checkoutModal").classList.remove("hidden");
+      document.getElementById("coStepSelect").classList.add("hidden");
+      document.getElementById("coStepCash").classList.add("hidden");
+      document.getElementById("coStepScan").classList.add("hidden");
+      document.getElementById("coStepDone").classList.remove("hidden");
+      document.getElementById("btnCloseCheckout").classList.add("hidden");
+
+      const spinner = document.getElementById("coDoneSpinner");
+      const title = document.getElementById("coDoneTitle");
+      const sub = document.getElementById("coDoneSub");
+      spinner.textContent = "⏳";
+      spinner.classList.add("animate-spin");
+      title.textContent = "Processing...";
+      sub.textContent = "Recording transaction...";
+
+      const isTraining = state.isTrainingMode || method === "Training";
+      const totals = computeSessionTotals(session);
+      const orderId = "NC-" + String(Date.now()).slice(-6);
+
+      const payloadItems = session.items.map(it => {
+        const fin = computeLineFinancials(it);
         return {
-          name: i.name,
-          category: i.category,
-          price: 0,
-          unitCost: unitCost,
-          unitProfit: -unitCost,
-          quantity: i.quantity,
-          totalCost: lineCost,
-          grossProfit: -lineCost
+          name: it.name,
+          category: it.category,
+          quantity: Number(it.quantity) || 1,
+          price: isTraining ? 0 : (Number(it.price) || 0),
+          unitCost: Number(it.unitCost) || 0,
+          lineTotal: isTraining ? 0 : fin.lineTotal,
+          discountAmount: isTraining ? 0 : fin.discountAmount,
+          netLineTotal: isTraining ? 0 : fin.netLineTotal,
+          totalCost: fin.lineCost,
+          grossProfit: isTraining ? 0 : fin.lineProfit
         };
       });
 
       const payload = {
         orderId: orderId,
-        tableNo: "Training",
-        customerName: "Staff Training",
-        guestCount: 1,
-        nationality: "Thai",
-        subtotal: 0,
-        discount: 0,
-        total: 0,
-        totalCost: totalCostSum,
-        grossProfit: -totalCostSum,
-        paymentMethod: "Training",
-        receivedCash: 0,
-        changeDue: 0,
-        tipAmount: 0,
-        tipReceiver: "No Tip",
-        slipImageBase64: null,
-        staffName: "Manager",
-        items: mappedItems
+        tableNo: session.tableNo,
+        customerName: session.customerName,
+        guestCount: session.guestCount,
+        nationality: session.nationality,
+        staffName: cashierName || session.staffName,
+        items: payloadItems,
+        subtotal: isTraining ? 0 : totals.subtotal,
+        itemDiscountTotal: isTraining ? 0 : totals.itemDiscountTotal,
+        orderDiscountTotal: isTraining ? 0 : totals.orderDiscountTotal,
+        totalDiscount: isTraining ? 0 : totals.totalDiscount,
+        total: isTraining ? 0 : totals.netTotal,
+        totalCost: totals.totalCost,
+        grossProfit: isTraining ? 0 : totals.grossProfit,
+        paymentMethod: isTraining ? "Training" : method,
+        tipAmount: isTraining ? 0 : tipAmount,
+        tipReceiver: isTraining ? "No Tip" : tipReceiver,
+        isTraining: isTraining,
+        status: isTraining ? "Training" : "Completed"
       };
 
       fetch(GAS_ENDPOINT, {
         method: "POST",
         mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "text/plain" },
         body: JSON.stringify(payload)
-      }).catch(err => console.error("Training sync error:", err));
-
-      delete tableSessions["Training"];
-      localStorage.setItem('NC_POS_SESSIONS', JSON.stringify(tableSessions));
-      currentOrder = [];
-      currentCustomer = "";
-
-      alert("Training order submitted! Stock data synced.");
-      renderOrder();
-      openSessionModal();
-    }
-
-    async function submitTransaction() {
-      const tipReceiver = document.getElementById('selectTipReceiver').value;
-      if (!tipReceiver) {
-        alert("Please select who received the tip.");
-        return;
-      }
-
-      const tipAmount = parseFloat(document.getElementById('inputTipAmount').value) || 0;
-      const btn = document.getElementById('btnCompleteTransaction');
-      btn.disabled = true;
-      btn.innerText = "Processing...";
-
-      const total = currentOrder.reduce((acc, i) => acc + (i.price * i.quantity), 0);
-      let totalCostSum = 0;
-      let grossProfitSum = 0;
-
-      const mappedItems = currentOrder.map(i => {
-        const unitCost = Number(i.totalCost) || 0;
-        const unitProfit = (i.price - unitCost);
-        const lineCost = unitCost * i.quantity;
-        const lineProfit = unitProfit * i.quantity;
-        totalCostSum += lineCost;
-        grossProfitSum += lineProfit;
-        return {
-          name: i.name,
-          category: i.category,
-          price: i.price,
-          unitCost: unitCost,
-          unitProfit: unitProfit,
-          quantity: i.quantity,
-          totalCost: lineCost,
-          grossProfit: lineProfit
-        };
-      });
-
-      const orderId = `NC-${Date.now().toString().slice(-6)}`;
-      const sessionData = tableSessions[currentTable] || {};
-
-      const payload = {
-        orderId: orderId,
-        tableNo: currentTable,
-        customerName: currentCustomer,
-        guestCount: sessionData.guestCount || 1,
-        nationality: sessionData.nationality || "Thai",
-        subtotal: total,
-        discount: 0,
-        total: total,
-        totalCost: totalCostSum,
-        grossProfit: grossProfitSum,
-        paymentMethod: selectedPayment,
-        receivedCash: selectedPayment === 'Cash' ? receivedCashAmount : (parseFloat(document.getElementById('inputScanPaidAmount').value) || total),
-        changeDue: selectedPayment === 'Cash' ? changeDueAmount : 0,
-        tipAmount: tipAmount,
-        tipReceiver: tipReceiver,
-        slipImageBase64: selectedPayment === 'Scan' ? slipImageBase64 : null,
-        staffName: selectedCashier || sessionData.orderStaff || "Staff",
-        items: mappedItems
-      };
-
-      fetch(GAS_ENDPOINT, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      }).catch(err => {
-        console.error("Background sync error:", err);
-      });
+      }).catch(() => {});
 
       setTimeout(() => {
-        delete tableSessions[currentTable];
-        localStorage.setItem('NC_POS_SESSIONS', JSON.stringify(tableSessions));
-        currentOrder = [];
-        currentCustomer = "";
+        spinner.textContent = "✅";
+        spinner.classList.remove("animate-spin");
+        title.textContent = isTraining ? "Training Logged!" : "Payment Completed!";
+        sub.textContent = `Order ID: ${orderId}`;
 
-        document.getElementById('paymentStepTip').classList.add('hidden');
-        document.getElementById('paymentSuccessContent').classList.remove('hidden');
+        delete state.sessions[state.activeSeatId];
+        state.activeSeatId = null;
+        state.isTrainingMode = false;
+        saveSeatsAndSessions();
+        updateHeaderSessionBanner();
+        renderCartUI();
+        closeMobileCartSheet();
 
         setTimeout(() => {
-          closePaymentModal();
-          renderOrder();
-          openSessionModal();
+          document.getElementById("btnCloseCheckout").classList.remove("hidden");
+          closeCheckoutModal();
+          openFloorModal();
         }, 3000);
       }, 1000);
     }
 
-    // 初期起動
-    openSessionModal();
-    renderCategoryTabs();
-    renderMenu();
-    fetchMasterData();
+    // ==========================================
+    // GENERIC CONFIRM & ESCAPE HELPERS
+    // ==========================================
+    function openGenericConfirm(title, body, onConfirm) {
+      document.getElementById("genericConfirmTitle").textContent = title;
+      document.getElementById("genericConfirmBody").textContent = body;
+      state.genericCallback = onConfirm;
+      document.getElementById("genericConfirmOkBtn").onclick = () => {
+        const cb = state.genericCallback;
+        closeGenericConfirm();
+        if (cb) cb();
+      };
+      document.getElementById("genericConfirmModal").classList.remove("hidden");
+    }
+
+    function closeGenericConfirm() {
+      document.getElementById("genericConfirmModal").classList.add("hidden");
+      state.genericCallback = null;
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function escapeJs(str) {
+      return String(str || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+    }
   </script>
 </body>
 </html>
